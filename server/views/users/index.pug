@@ -20,3 +20,6 @@ block content
           td= formatDate(user.createdAt)
           td
             a(href=`/users/${user.id}/edit`)= t('views.users.edit')
+            form(action=`/users/${user.id}` method='post')
+              input(name='_method' type='hidden' value='delete')
+              input.btn.btn-link(type='submit' value='Удалить')

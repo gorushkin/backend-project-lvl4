@@ -36,7 +36,15 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/users/:id', (req, reply) => {
-      console.log('asdfasdfasdfasdfasd');
+    .patch('/users/:id', async (req, reply) => {
+      const {
+        body: {
+          data: { firstname, lastname, email, password },
+        },
+      } = req;
+      const user = await app.objection.models.user.query().findById(req.params.id);
+      await user.$query().patch({ firstname });
+      req.flash('success', i18next.t('flash.users.edit.success'));
+      reply.redirect('/users');
     });
 };
