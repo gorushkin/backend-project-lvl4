@@ -13,6 +13,16 @@ export default (app) => {
       const user = new app.objection.models.user();
       reply.render('users/new', { user });
     })
+    .get('/users/:id/edit', async (req, reply) => {
+      if (req.user.id == req.params.id) {
+        const user = await app.objection.models.user.query().findById(req.params.id);
+        reply.render('users/edit', { user });
+      } else {
+        req.flash('error', i18next.t('flash.users.edit.error'));
+        reply.redirect('/users');
+        return reply;
+      }
+    })
     .post('/users', async (req, reply) => {
       try {
         const user = await app.objection.models.user.fromJson(req.body.data);
@@ -21,9 +31,12 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       } catch ({ data }) {
-        req.flash('error', i18next.t('flash.users.create.error'));
+        req.flash('error', i18next.t('flash.users.edit.error'));
         reply.render('users/new', { user: req.body.data, errors: data });
         return reply;
       }
+    })
+    .patch('/users/:id', (req, reply) => {
+      console.log('asdfasdfasdfasdfasd');
     });
 };

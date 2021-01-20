@@ -5,11 +5,18 @@ block content
     thead
       tr
         th= t('views.users.id')
+        th= t('views.users.firstname')
+        th= t('views.users.lastname')
         th= t('views.users.email')
         th= t('views.users.createdAt')
+        th= t('views.users.actions')
     tbody
       each user in users
         tr
           td= user.id
+          td= user.firstname
+          td= user.lastname
           td= user.email
           td= formatDate(user.createdAt)
+          td
+            a(href=`/users/${user.id}/edit`)= t('views.users.edit')
