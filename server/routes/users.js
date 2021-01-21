@@ -14,6 +14,11 @@ export default (app) => {
       reply.render('users/new', { user });
     })
     .get('/users/:id/edit', async (req, reply) => {
+      if (!reply.locals.isAuthenticated()) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect('/');
+        return reply;
+      }
       if (req.user.id == req.params.id) {
         const user = await app.objection.models.user.query().findById(req.params.id);
         reply.render('users/edit', { user });
@@ -48,5 +53,24 @@ export default (app) => {
       await user.$query().patch(fields);
       req.flash('success', i18next.t('flash.users.edit.success'));
       reply.redirect('/users');
+    })
+    .delete('/users/:id', async (req, reply) => {
+      if (!reply.locals.isAuthenticated()) {
+        req.flash('error', i18next.t('flash.authError'));
+        reply.redirect('/');
+        return reply;
+      }
+      if (req.user.id == req.params.id) {
+        const user = await app.objection.models.user.query().findById(req.params.id);
+        await user.$query().delete();
+        req.logOut();
+        req.flash('info', i18next.t('flash.users.delete.success'));
+        reply.redirect('/users');
+        return reply;
+      } else {
+        req.flash('error', i18next.t('flash.users.edit.error'));
+        reply.redirect('/users');
+        return reply;
+      }
     });
 };
