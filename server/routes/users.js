@@ -37,13 +37,15 @@ export default (app) => {
       }
     })
     .patch('/users/:id', async (req, reply) => {
-      const {
-        body: {
-          data: { firstname, lastname, email, password },
-        },
-      } = req;
+      const arr = Object.entries(req.body.data);
+      const fields = arr.reduce((acc, [key, value]) => {
+        if (value) {
+          return { ...acc, [key]: value };
+        }
+        return acc;
+      }, {});
       const user = await app.objection.models.user.query().findById(req.params.id);
-      await user.$query().patch({ firstname });
+      await user.$query().patch(fields);
       req.flash('success', i18next.t('flash.users.edit.success'));
       reply.redirect('/users');
     });
