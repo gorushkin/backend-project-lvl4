@@ -36,12 +36,12 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       } catch ({ data }) {
-        req.flash('error', i18next.t('flash.users.edit.error'));
+        req.flash('error', i18next.t('flash.users.create.error'));
         reply.render('users/new', { user: req.body.data, errors: data });
         return reply;
       }
     })
-    .patch('/users/:id', async (req, reply) => {
+    .patch('/users/:id', { name: 'usersUpdate' }, async (req, reply) => {
       const arr = Object.entries(req.body.data);
       const fields = arr.reduce((acc, [key, value]) => {
         if (value) {

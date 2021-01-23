@@ -62,6 +62,27 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
+  it('update', async () => {
+    const existingUserData = testData.users.existing;
+    const { id } = await models.user.query().findOne({ email: existingUserData.email });
+    const updatedUserData = testData.users.updated;
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('usersUpdate', { id }),
+      payload: {
+        data: updatedUserData,
+      },
+    });
+    expect(response.statusCode).toBe(302);
+
+    const updatedUser = await models.user.query().findOne({ id });
+    const expected = {
+      ..._.omit(updatedUserData, 'password'),
+      passwordDigest: encrypt(updatedUserData.password),
+    };
+    expect(updatedUser).toMatchObject(expected);
+  });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();
