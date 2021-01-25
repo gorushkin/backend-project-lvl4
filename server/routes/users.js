@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import _ from 'lodash';
 
 export default (app) => {
   app
@@ -42,21 +43,17 @@ export default (app) => {
     })
     .patch('/users/:id', { name: 'userUpdate' }, async (req, reply) => {
       try {
-        const arr = Object.entries(req.body.data);
-        const fields = arr.reduce((acc, [key, value]) => {
-          if (value) {
-            return { ...acc, [key]: value };
-          }
-          return acc;
-        }, {});
+        const {
+          body: { data },
+        } = req;
         const user = await app.objection.models.user.query().findById(req.params.id);
-        await user.$query().patch(fields);
+        await user.$query().patch(data);
         req.flash('success', i18next.t('flash.users.edit.success'));
         reply.redirect('/users');
         return reply;
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.users.edit.error'));
-        reply.render('users/new', { user: req.body.data, errors: data });
+        reply.redirect(app.reverse('userEdit', { id: req.params.id }));
         return reply;
       }
     })
