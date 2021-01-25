@@ -79,6 +79,7 @@ const addHooks = (app) => {
   app.addHook('preHandler', async (req, reply) => {
     reply.locals = {
       isAuthenticated: () => req.isAuthenticated(),
+      isUserEditable: () => req.user.id === parseInt(req.params.id, 10),
     };
   });
 };
