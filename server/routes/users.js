@@ -25,7 +25,7 @@ export default (app) => {
         req.flash('error', i18next.t('flash.users.authError'));
         reply.redirect('/users');
         return reply;
-      },
+      }
     )
     .post('/users', { name: 'userCreate' }, async (req, reply) => {
       try {
@@ -80,6 +80,6 @@ export default (app) => {
           reply.render('users/new', { user: req.body.data, errors: data });
           return reply;
         }
-      },
+      }
     );
 };

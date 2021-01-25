@@ -83,6 +83,33 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
+  it('delete', async () => {
+    const responseSignIn = await app.inject({
+      method: 'POST',
+      url: app.reverse('session'),
+      payload: {
+        data: testData.users.existing,
+      },
+    });
+
+    const [sessionCookie] = responseSignIn.cookies;
+    const { name, value } = sessionCookie;
+    const cookie = { [name]: value };
+
+    const existingUserData = testData.users.existing;
+    const { id } = await models.user.query().findOne({ email: existingUserData.email });
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('userDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const deletedUser = await models.user.query().findOne({ id });
+    expect(deletedUser).toEqual(undefined);
+  });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();
