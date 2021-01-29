@@ -12,5 +12,16 @@
       "email": "11lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
     }
+  },
+  "statuses": {
+    "new": {
+      "name": "new status"
+    },
+    "existing": {
+      "name": "status1"
+    },
+    "updated": {
+      "name": "updated status1"
+    }
   }
 }
