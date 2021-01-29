@@ -5,7 +5,6 @@ version: '3'
 services:
   app:
     build: .
-    # container_name: task-manager-test2
     volumes:
       - .:/srv/task-manager
     ports:
