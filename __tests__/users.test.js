@@ -43,6 +43,19 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
+  it('edit user page', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+    const existingUserData = testData.users.existing;
+    const { id } = await models.user.query().findOne({ email: existingUserData.email });
+    const response = await app.inject({
+      method: 'GET',
+      url: `/users/${id}/edit`,
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
   it('create', async () => {
     const params = testData.users.new;
     const response = await app.inject({
@@ -63,7 +76,7 @@ describe('test users CRUD', () => {
   });
 
   it('update', async () => {
-    const cookie = await getCookie(app, testData.users.existing)
+    const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
@@ -87,7 +100,7 @@ describe('test users CRUD', () => {
   });
 
   it('delete', async () => {
-    const cookie = await getCookie(app, testData.users.existing)
+    const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
