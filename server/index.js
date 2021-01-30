@@ -115,19 +115,23 @@ const registerPlugins = (app) => {
     models,
   });
 
-  app.decorate('checkUserRights', async (req, reply, done) => {
-    if (req.user.id === parseInt(req.params.id, 10)) {
-      done();
-    } else {
-      req.flash('error', i18next.t('flash.users.authError'));
-      reply.redirect('/users');
-      return reply;
-    }
-  });
+  // app.decorate('checkUserRights', async (req, reply, done) => {
+  //   if (req.user.id === parseInt(req.params.id, 10)) {
+  //     done();
+  //   } else {
+  //     req.flash('error', i18next.t('flash.users.authError'));
+  //     reply.redirect('/users');
+  //     return reply;
+  //   }
+  // });
 };
 
 export default () => {
-  const app = fastify();
+  const app = fastify({
+    logger: {
+      prettyPrint: isDevelopment,
+    },
+  });
 
   registerPlugins(app);
 

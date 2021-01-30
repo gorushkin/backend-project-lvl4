@@ -15,8 +15,9 @@ export default (app) => {
     })
     .get(
       '/users/:id/edit',
-      { name: 'userEdit', preValidation: app.authenticate, preHandler: app.checkUserRights },
+      { name: 'userEdit', preValidation: app.authenticate},
       async (req, reply) => {
+        console.log('-----');
         const user = await app.objection.models.user.query().findById(req.params.id);
         reply.render('users/edit', { user });
         return reply;
