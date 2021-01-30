@@ -38,8 +38,6 @@ container-build:
 		-itd \
 		--name task-manager-test \
 		-p 127.0.0.1:5000:5000/tcp \
-		# -e NODE_PORT=5000 \
-		# данные монитируются, а не копируются
 		-v "$$(pwd)"/:/srv/task-manager/ \
 		task-manager:dev
 
