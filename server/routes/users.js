@@ -17,8 +17,13 @@ export default (app) => {
       '/users/:id/edit',
       { name: 'userEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const user = await app.objection.models.user.query().findById(req.params.id);
-        reply.render('users/edit', { user });
+        if (req.user.id === parseInt(req.params.id, 10)) {
+          const user = await app.objection.models.user.query().findById(req.params.id);
+          reply.render('users/edit', { user });
+          return reply;
+        }
+        req.flash('error', i18next.t('flash.users.authError'));
+        reply.redirect('/users');
         return reply;
       },
     )
@@ -57,20 +62,26 @@ export default (app) => {
     )
     .delete(
       '/users/:id',
-      { name: 'userDelete', preValidation: app.authenticate, preHandler: app.checkUserRights },
+      { name: 'userDelete', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const user = await app.objection.models.user.query().findById(req.params.id);
-          await user.$query().delete();
-          req.logOut();
-          req.flash('info', i18next.t('flash.users.delete.success'));
-          reply.redirect('/users');
-          return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.users.delete.error'));
-          reply.render('users/new', { user: req.body.data, errors: data });
-          return reply;
+        if (req.user.id === parseInt(req.params.id, 10)) {
+          try {
+            const user = await app.objection.models.user.query().findById(req.params.id);
+            await user.$query().delete();
+            req.logOut();
+            req.flash('info', i18next.t('flash.users.delete.success'));
+            reply.redirect('/users');
+            return reply;
+          } catch ({ data }) {
+            req.flash('error', i18next.t('flash.users.delete.error'));
+            reply.render('users/new', { user: req.body.data, errors: data });
+            return reply;
+          }
+        } else {
+          req.flash('error', i18next.t('flash.users.authError'));
         }
+        reply.redirect('/users');
+        return reply;
       },
     );
 };

@@ -94,36 +94,22 @@ const registerPlugins = (app) => {
     },
   });
 
-  fastifyPassport.registerUserDeserializer((user) =>
-    app.objection.models.user.query().findById(user.id)
-  );
+  fastifyPassport.registerUserDeserializer((user) => app.objection.models.user.query().findById(user.id));
   fastifyPassport.registerUserSerializer((user) => Promise.resolve(user));
   fastifyPassport.use(new FormStrategy('form', app));
   app.register(fastifyPassport.initialize());
   app.register(fastifyPassport.secureSession());
   app.decorate('fp', fastifyPassport);
-  app.decorate('authenticate', (...args) =>
-    fastifyPassport.authenticate('form', {
-      failureRedirect: app.reverse('root'),
-      failureFlash: i18next.t('flash.authError'),
-    })(...args)
-  );
+  app.decorate('authenticate', (...args) => fastifyPassport.authenticate('form', {
+    failureRedirect: app.reverse('root'),
+    failureFlash: i18next.t('flash.authError'),
+  })(...args));
 
   app.register(fastifyMethodOverride);
   app.register(fastifyObjectionjs, {
     knexConfig: knexConfig[mode],
     models,
   });
-
-  // app.decorate('checkUserRights', async (req, reply, done) => {
-  //   if (req.user.id === parseInt(req.params.id, 10)) {
-  //     done();
-  //   } else {
-  //     req.flash('error', i18next.t('flash.users.authError'));
-  //     reply.redirect('/users');
-  //     return reply;
-  //   }
-  // });
 };
 
 export default () => {
