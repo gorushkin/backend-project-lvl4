@@ -11,6 +11,10 @@
     "updated": {
       "email": "11lawrence.kulas87@outlook.com",
       "password": "O6AvLIQL1cbzrre"
+    },
+    "another": {
+      "email": "anotherUser@outlook.com",
+      "password": "anotherpassword"
     }
   }
 }
