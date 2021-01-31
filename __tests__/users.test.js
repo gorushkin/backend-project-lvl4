@@ -124,7 +124,7 @@ describe('test users CRUD', () => {
       passwordDigest: encrypt(anotherUserData.password),
     };
     expect(notUpdatedUser).toMatchObject(expected);
-  })
+  });
 
   it('user delete', async () => {
     const cookie = await getCookie(app, testData.users.existing);
