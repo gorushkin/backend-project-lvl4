@@ -44,19 +44,23 @@ export default (app) => {
       '/users/:id',
       { name: 'userUpdate', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const {
-            body: { data },
-          } = req;
-          const user = await app.objection.models.user.query().findById(req.params.id);
-          await user.$query().patch(data);
-          req.flash('success', i18next.t('flash.users.edit.success'));
-          reply.redirect('/users');
-          return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.users.edit.error'));
-          reply.redirect(app.reverse('userEdit', { id: req.params.id }));
-          return reply;
+        if (req.user.id === parseInt(req.params.id, 10)) {
+          try {
+            const {
+              body: { data },
+            } = req;
+            const user = await app.objection.models.user.query().findById(req.params.id);
+            await user.$query().patch(data);
+            req.flash('success', i18next.t('flash.users.edit.success'));
+            reply.redirect('/users');
+            return reply;
+          } catch ({ data }) {
+            req.flash('error', i18next.t('flash.users.edit.error'));
+            reply.redirect(app.reverse('userEdit', { id: req.params.id }));
+            return reply;
+          }
+        } else {
+          return reply.methodNotAllowed();
         }
       },
     )

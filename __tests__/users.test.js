@@ -1,5 +1,6 @@
 // @ts-check
 
+import { it } from '@jest/globals';
 import _ from 'lodash';
 import getApp from '../server/index.js';
 import encrypt from '../server/lib/secure.js';
@@ -107,7 +108,6 @@ describe('test users CRUD', () => {
     const user = await models.user.query().findOne({ email: anotherUserData.email });
     const { id } = user;
 
-    // const updatedUserData = testData.users.updated;
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('userEdit', { id }),
@@ -126,7 +126,34 @@ describe('test users CRUD', () => {
     expect(notUpdatedUser).toMatchObject(expected);
   });
 
-  it('user delete', async () => {
+  it('try patch another user profile', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+    const existingUserData = testData.users.existing;
+    const anotherUserData = testData.users.another;
+    const user = await models.user.query().findOne({ email: anotherUserData.email });
+    const { id } = user;
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('userUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: existingUserData,
+      },
+    });
+
+    expect(response.statusCode).toBe(405);
+
+    const notUpdatedUser = await models.user.query().findOne({ id });
+    const expected = {
+      ..._.omit(notUpdatedUser, 'password'),
+      passwordDigest: encrypt(anotherUserData.password),
+    };
+    expect(notUpdatedUser).toMatchObject(expected);
+
+  })
+
+  it.skip('user delete', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
