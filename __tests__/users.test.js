@@ -25,7 +25,7 @@ describe('test users CRUD', () => {
     await prepareData(app);
   });
 
-  it('"user list" template`s status code is 200', async () => {
+  it.skip('"user list" template`s status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('users'),
@@ -34,7 +34,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('"user create" template`s status code is 200', async () => {
+  it.skip('"user create" template`s status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newUser'),
@@ -43,7 +43,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('"user edit" template`s status code is 200', async () => {
+  it.skip('"user edit" template`s status code is 200', async () => {
     const cookie = await getCookie(app, testData.users.existing);
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
@@ -56,7 +56,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('user create', async () => {
+  it.skip('user create', async () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
@@ -75,7 +75,7 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
-  it('user update', async () => {
+  it.skip('user update', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
@@ -99,7 +99,7 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('user can not edit another user data', async () => {
+  it.skip('user can not edit another user data', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
@@ -126,7 +126,7 @@ describe('test users CRUD', () => {
     expect(notUpdatedUser).toMatchObject(expected);
   });
 
-  it('user delete', async () => {
+  it.skip('user delete', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
@@ -143,7 +143,7 @@ describe('test users CRUD', () => {
     expect(deletedUser).toEqual(undefined);
   });
 
-  it('user can not delete another user', async () => {
+  it.skip('user can not delete another user', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const anotherUserData = testData.users.another;

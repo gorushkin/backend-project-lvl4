@@ -38,7 +38,7 @@ describe('test statuses CRUD', () => {
     cookie = { [name]: value };
   });
 
-  it('index', async () => {
+  it('GET 200 on statuses', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('statuses'),

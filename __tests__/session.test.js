@@ -16,7 +16,7 @@ describe('test session', () => {
     testData = getTestData();
   });
 
-  it('test sign in / sign out', async () => {
+  it.skip('test sign in / sign out', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newSession'),
