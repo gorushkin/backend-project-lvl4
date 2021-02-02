@@ -5,11 +5,21 @@ block content
     thead
       tr
         th= t('views.users.id')
+        th= t('views.users.firstname')
+        th= t('views.users.lastname')
         th= t('views.users.email')
         th= t('views.users.createdAt')
+        th= t('views.users.actions')
     tbody
       each user in users
         tr
           td= user.id
+          td= user.firstname
+          td= user.lastname
           td= user.email
           td= formatDate(user.createdAt)
+          td
+            a(href=route('userEdit', {id: user.id}))= t('views.users.edit')
+            form(action=route('userDelete', {id: user.id}) method='post')
+              input(name='_method' type='hidden' value='delete')
+              input.btn.btn-link(type='submit' value='Удалить')
