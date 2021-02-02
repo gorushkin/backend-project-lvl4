@@ -17,7 +17,7 @@ export default (app) => {
       '/users/:id/edit',
       { name: 'userEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        if (reply.locals.isUserEditable()) {
+        if (req.user.id === parseInt(req.params.id, 10)) {
           const user = await app.objection.models.user.query().findById(req.params.id);
           reply.render('users/edit', { user });
           return reply;
@@ -40,42 +40,48 @@ export default (app) => {
         return reply;
       }
     })
-    .patch('/users/:id', { name: 'userUpdate' }, async (req, reply) => {
-      try {
-        const {
-          body: { data },
-        } = req;
-        const user = await app.objection.models.user.query().findById(req.params.id);
-        await user.$query().patch(data);
-        req.flash('success', i18next.t('flash.users.edit.success'));
-        reply.redirect('/users');
-        return reply;
-      } catch ({ data }) {
-        req.flash('error', i18next.t('flash.users.edit.error'));
-        reply.redirect(app.reverse('userEdit', { id: req.params.id }));
-        return reply;
-      }
-    })
+    .patch(
+      '/users/:id',
+      { name: 'userUpdate', preValidation: app.authenticate },
+      async (req, reply) => {
+        try {
+          const {
+            body: { data },
+          } = req;
+          const user = await app.objection.models.user.query().findById(req.params.id);
+          await user.$query().patch(data);
+          req.flash('success', i18next.t('flash.users.edit.success'));
+          reply.redirect('/users');
+          return reply;
+        } catch ({ data }) {
+          req.flash('error', i18next.t('flash.users.edit.error'));
+          reply.redirect(app.reverse('userEdit', { id: req.params.id }));
+          return reply;
+        }
+      },
+    )
     .delete(
       '/users/:id',
       { name: 'userDelete', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          if (reply.locals.isUserEditable()) {
+        if (req.user.id === parseInt(req.params.id, 10)) {
+          try {
             const user = await app.objection.models.user.query().findById(req.params.id);
             await user.$query().delete();
             req.logOut();
             req.flash('info', i18next.t('flash.users.delete.success'));
-          } else {
-            req.flash('error', i18next.t('flash.users.authError'));
+            reply.redirect('/users');
+            return reply;
+          } catch ({ data }) {
+            req.flash('error', i18next.t('flash.users.delete.error'));
+            reply.render('users/new', { user: req.body.data, errors: data });
+            return reply;
           }
-          reply.redirect('/users');
-          return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.users.delete.error'));
-          reply.render('users/new', { user: req.body.data, errors: data });
-          return reply;
+        } else {
+          req.flash('error', i18next.t('flash.users.authError'));
         }
+        reply.redirect('/users');
+        return reply;
       },
     );
 };

@@ -3,7 +3,7 @@
 import _ from 'lodash';
 import getApp from '../server/index.js';
 import encrypt from '../server/lib/secure.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, prepareData, getCookie } from './helpers/index.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -25,7 +25,7 @@ describe('test users CRUD', () => {
     await prepareData(app);
   });
 
-  it('index', async () => {
+  it('"user list" template`s status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('users'),
@@ -34,7 +34,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('new', async () => {
+  it('"user create" template`s status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newUser'),
@@ -43,7 +43,20 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('create', async () => {
+  it('"user edit" template`s status code is 200', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+    const existingUserData = testData.users.existing;
+    const { id } = await models.user.query().findOne({ email: existingUserData.email });
+    const response = await app.inject({
+      method: 'GET',
+      url: `/users/${id}/edit`,
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('user create', async () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
@@ -62,13 +75,16 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
-  it('update', async () => {
+  it('user update', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
     const updatedUserData = testData.users.updated;
     const response = await app.inject({
       method: 'PATCH',
       url: app.reverse('userUpdate', { id }),
+      cookies: cookie,
       payload: {
         data: updatedUserData,
       },
@@ -83,18 +99,35 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('delete', async () => {
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
+  it('user can not edit another user data', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+
+    const existingUserData = testData.users.existing;
+    const anotherUserData = testData.users.another;
+    const user = await models.user.query().findOne({ email: anotherUserData.email });
+    const { id } = user;
+
+    // const updatedUserData = testData.users.updated;
+    const response = await app.inject({
+      method: 'GET',
+      url: app.reverse('userEdit', { id }),
+      cookies: cookie,
       payload: {
-        data: testData.users.existing,
+        data: existingUserData,
       },
     });
+    expect(response.statusCode).toBe(302);
 
-    const [sessionCookie] = responseSignIn.cookies;
-    const { name, value } = sessionCookie;
-    const cookie = { [name]: value };
+    const notUpdatedUser = await models.user.query().findOne({ id });
+    const expected = {
+      ..._.omit(notUpdatedUser, 'password'),
+      passwordDigest: encrypt(anotherUserData.password),
+    };
+    expect(notUpdatedUser).toMatchObject(expected);
+  });
+
+  it('user delete', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
@@ -108,6 +141,25 @@ describe('test users CRUD', () => {
 
     const deletedUser = await models.user.query().findOne({ id });
     expect(deletedUser).toEqual(undefined);
+  });
+
+  it('user can not delete another user', async () => {
+    const cookie = await getCookie(app, testData.users.existing);
+
+    const anotherUserData = testData.users.another;
+    const anotherUser = await models.user.query().findOne({ email: anotherUserData.email });
+    const { id } = anotherUser;
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('userDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const unDeletedUser = await models.user.query().findOne({ id });
+    expect(anotherUser).toMatchObject(unDeletedUser);
   });
 
   afterEach(async () => {

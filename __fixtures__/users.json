@@ -10,5 +10,9 @@
   {
     "email": "nona_murray@yahoo.com",
     "passwordDigest": "760391e7dceb3cf65ee23e97ca3db8c1515d18c3434b003c1fd781053afcf86f"
+  },
+  {
+    "email": "anotherUser@outlook.com",
+    "passwordDigest": "16472b57e17a8a0eafd5d6811cf5b182f6b4e2812e322d5fc33b0d1f19fb5832"
   }
 ]
