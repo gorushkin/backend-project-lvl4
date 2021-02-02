@@ -14,6 +14,7 @@ import fastifySensible from 'fastify-sensible';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
+import fastifyAuth from 'fastify-auth';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
@@ -83,6 +84,7 @@ const addHooks = (app) => {
 };
 
 const registerPlugins = (app) => {
+  app.register(fastifyAuth);
   app.register(fastifySensible);
   app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes.plugin);
@@ -111,6 +113,15 @@ const registerPlugins = (app) => {
     knexConfig: knexConfig[mode],
     models,
   });
+
+  app.decorate('checkIfUSerCanEditProfile', (request, reply, done) => {
+    if (request.user.id === parseInt(request.params.id, 10)) {
+      return done();
+    }
+    request.flash('error', i18next.t('flash.users.authError'));
+    reply.redirect('/users');
+    return reply;
+  })
 };
 
 export default () => {
