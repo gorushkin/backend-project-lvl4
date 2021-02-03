@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import getApp from '../server/index.js';
-import encrypt from '../server/lib/secure.js';
 import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
@@ -38,7 +37,7 @@ describe('test statuses CRUD', () => {
     cookie = { [name]: value };
   });
 
-  it('GET 200 on statuses', async () => {
+  it('Get statuses page work', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('statuses'),
@@ -48,16 +47,17 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('new unauthorized user', async () => {
+  it('Can not get statuse page work with unauthorized guest', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newStatus'),
     });
 
+    // console.log('response: ', response);
     expect(response.statusCode).toBe(302);
   });
 
-  it('new authorized user', async () => {
+  it('Get statuses create page work', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newStatus'),
@@ -67,10 +67,81 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('create', async () => {
-    const params = testData.statuses.new;
-  })
+  it('Create new status', async () => {
+    const expected = testData.statuses.new;
 
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('statusCreate'),
+      cookies: cookie,
+      payload: {
+        data: expected,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const status = await models.status.query().findOne({ name: expected.name });
+    expect(status).toMatchObject(expected);
+  });
+
+  it('Can not create status with existing name', async () => {
+    const exsistingStatusData = testData.statuses.existing;
+
+    const expectedStatuses = await models.status.query();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('statusCreate'),
+      cookies: cookie,
+      payload: {
+        data: exsistingStatusData,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    const updatedStatuses = await models.status.query();
+    expect(updatedStatuses).toMatchObject(expectedStatuses);
+  });
+
+  it('Edit existing status', async () => {
+    const exsistingStatusData = testData.statuses.existing;
+    const updatedStatusData = testData.statuses.updated;
+
+    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('statusUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: updatedStatusData,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedStatus = await models.status.query().findOne({ id });
+    expect(updatedStatus).toMatchObject(updatedStatusData);
+  });
+
+  it('Delete existing status', async () => {
+    const exsistingStatusData = testData.statuses.existing;
+
+    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('statusDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const deletedStatus = await models.status.query().findOne({ id });
+    expect(deletedStatus).toEqual(undefined);
+  });
 
   afterEach(async () => {
     // после каждого теста откатываем миграции
