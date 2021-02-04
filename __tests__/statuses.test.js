@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import getApp from '../server/index.js';
-import { getTestData, prepareData } from './helpers/index.js';
+import { getTestData, prepareData, getCookie } from './helpers/index.js';
 
 describe('test statuses CRUD', () => {
   let app;
@@ -23,18 +23,7 @@ describe('test statuses CRUD', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
-
-    const responseSignIn = await app.inject({
-      method: 'POST',
-      url: app.reverse('session'),
-      payload: {
-        data: testData.users.existing,
-      },
-    });
-
-    const [sessionCookie] = responseSignIn.cookies;
-    const { name, value } = sessionCookie;
-    cookie = { [name]: value };
+    cookie = await getCookie(app, testData.users.existing);
   });
 
   it('Get statuses page work', async () => {
@@ -53,7 +42,6 @@ describe('test statuses CRUD', () => {
       url: app.reverse('newStatus'),
     });
 
-    // console.log('response: ', response);
     expect(response.statusCode).toBe(302);
   });
 
@@ -61,6 +49,19 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newStatus'),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(200);
+  });
+
+  it('Get statuses edit page work', async () => {
+    const exsistingStatusData = testData.statuses.existing;
+    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: app.reverse('statusEdit', { id }),
       cookies: cookie,
     });
 
@@ -140,7 +141,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(302);
 
     const deletedStatus = await models.status.query().findOne({ id });
-    expect(deletedStatus).toEqual(undefined);
+    expect(deletedStatus).toBeUndefined();
   });
 
   afterEach(async () => {

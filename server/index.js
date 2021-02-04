@@ -120,7 +120,6 @@ export default () => {
     },
   });
 
-
   registerPlugins(app);
 
   setupLocalization();

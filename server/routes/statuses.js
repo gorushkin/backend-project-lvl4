@@ -10,8 +10,8 @@ export default (app) => {
       return reply;
     })
     .get('/statuses/new', { name: 'newStatus', preValidation: app.authenticate }, (req, reply) => {
-      const user = new app.objection.models.user();
-      reply.render('statuses/new', { user });
+      const status = new app.objection.models.status();
+      reply.render('statuses/new', { status });
     })
     .post(
       '/statuses',
@@ -25,7 +25,7 @@ export default (app) => {
           return reply;
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.statuses.create.error'));
-          reply.render('/statuses/new', { user: req.body.data, errors: data });
+          reply.render('/statuses/new', { status: req.body.data, errors: data });
           return reply;
         }
       }
