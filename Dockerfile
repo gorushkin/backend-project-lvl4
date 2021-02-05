@@ -8,9 +8,3 @@ WORKDIR /srv/task-manager/
 COPY ./package*.json /srv/task-manager/
 
 RUN npm clean-install
-
-# дефолтный порт
-# EXPOSE $NODE_PORT
-
-# если копировать тут, то данные будут неизменяемыми (КОПИЯ)
-# COPY . .
