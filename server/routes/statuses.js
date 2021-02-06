@@ -28,7 +28,7 @@ export default (app) => {
           reply.render('/statuses/new', { status: req.body.data, errors: data });
           return reply;
         }
-      }
+      },
     )
     .get(
       '/statuses/:id/edit',
@@ -37,7 +37,7 @@ export default (app) => {
         const status = await app.objection.models.status.query().findById(req.params.id);
         reply.render('statuses/edit', { status });
         return reply;
-      }
+      },
     )
     .patch(
       '/statuses/:id',
@@ -57,7 +57,7 @@ export default (app) => {
           reply.redirect(app.reverse('statusEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/statuses/:id',
@@ -72,6 +72,6 @@ export default (app) => {
         }
         reply.redirect('/statuses');
         return reply;
-      }
+      },
     );
 };

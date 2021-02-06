@@ -1,6 +1,5 @@
 // @ts-check
 
-import _ from 'lodash';
 import getApp from '../server/index.js';
 import { getTestData, prepareData, getCookie } from './helpers/index.js';
 

@@ -13,8 +13,8 @@ export const prepareData = async (app) => {
   const { knex } = app.objection;
 
   // получаем данные из фикстур и заполняем БД
-  const users = await knex('users').insert(getFixtureData('users.json'));
-  const tasks = await knex('statuses').insert(getFixtureData('statuses.json'));
+  await knex('users').insert(getFixtureData('users.json'));
+  await knex('statuses').insert(getFixtureData('statuses.json'));
 };
 
 export const getCookie = async (app, data) => {
