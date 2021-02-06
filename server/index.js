@@ -121,7 +121,7 @@ const registerPlugins = (app) => {
     request.flash('error', i18next.t('flash.users.authError'));
     reply.redirect('/users');
     return reply;
-  })
+  });
 };
 
 export default () => {
@@ -136,7 +136,9 @@ export default () => {
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
-  addRoutes(app);
+  app.after(() => {
+    addRoutes(app);
+  });
   addHooks(app);
 
   return app;

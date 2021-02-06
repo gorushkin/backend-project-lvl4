@@ -150,10 +150,9 @@ describe('test users CRUD', () => {
       passwordDigest: encrypt(anotherUserData.password),
     };
     expect(notUpdatedUser).toMatchObject(expected);
+  });
 
-  })
-
-  it.skip('user delete', async () => {
+  it('user delete', async () => {
     const cookie = await getCookie(app, testData.users.existing);
 
     const existingUserData = testData.users.existing;
