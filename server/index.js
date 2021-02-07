@@ -114,7 +114,7 @@ const registerPlugins = (app) => {
     models,
   });
 
-  app.decorate('checkIfUSerCanEditProfile', (request, reply, done) => {
+  app.decorate('checkIfUserCanEditProfile', (request, reply, done) => {
     if (request.user.id === parseInt(request.params.id, 10)) {
       return done();
     }
