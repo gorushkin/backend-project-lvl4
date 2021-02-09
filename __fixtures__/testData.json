@@ -16,5 +16,16 @@
       "email": "anotherUser@outlook.com",
       "password": "anotherpassword"
     }
+  },
+  "statuses": {
+    "new": {
+      "name": "new status"
+    },
+    "existing": {
+      "name": "status1"
+    },
+    "updated": {
+      "name": "updated status1"
+    }
   }
 }
