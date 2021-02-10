@@ -1,0 +1,23 @@
+extends ../layouts/application.pug
+
+block header
+  = t('views.tasks.createTitle')
+
+block content
+  +formFor()(action=route('tasks') method='post')
+    +input(task, 'name', errors)(type="text")
+    +input(task, 'description', errors)(type="text")
+    .form-group
+      label(for='data_statusId') Статус
+      select#data_statusId.form-control(name='data[statusId]')
+        option
+        each status in statuses
+          option(value=status.id)= status.name
+    .form-group
+      label(for='data_executorId') Исполнитель
+      select#data_executorId.form-control(name='data[executorId]')
+        option
+        each user in users
+          option(value=user.id)= `${user.firstname} ${user.lastname}`
+
+    +submit(task)(value=t('views.tasks.new.submit'))
