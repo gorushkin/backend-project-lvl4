@@ -1,14 +1,22 @@
 extends ../layouts/application.pug
 
 block header
-  = t('views.users.editTitle')
-
+  = t('views.tasks.editTitle')
 
 block content
-  +formFor()(action=`/users/${user.id}` method='post')
-    +input(user, 'firstname', errors)(type="text")
-    +input(user, 'lastname', errors)(type="text")
-    +input(user, 'email', errors)(type="text")
-    +input(user, 'password', errors)(type="password")
-    input(name='_method' type='hidden' value='patch')
-    +submit(user)(value=t('views.users.new.submit'))
+  +formFor()(action=route('tasks') method='post')
+    +input(task, 'name', errors)(type="text")
+    +input(task, 'description', errors)(type="text")
+    .form-group
+      label(for='data_statusId') Статус
+      select#data_statusId.form-control(name='data[statusId]')
+        option
+        each status in statuses
+          option(value=status.id, selected= status.id == task.statusId)= status.name
+    .form-group
+      label(for='data_executorId') Исполнитель
+      select#data_executorId.form-control(name='data[executorId]')
+        each user in users
+          option(value=user.id, selected= user.id == task.executorId)= `${user.firstname} ${user.lastname}`
+
+    +submit(task)(value=t('views.tasks.edit'))

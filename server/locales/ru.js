@@ -55,6 +55,7 @@ module.exports = {
           success: 'Задача успешно удалёна',
         },
         authError: 'Вы не можете редактировать или удалять другого пользователя',
+        detailsError: 'Нет задачи с такими параметрами',
       },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
     },
@@ -106,6 +107,7 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         status: 'Статус',
+        edit: 'Изменить',
         creator: 'Автор',
         executor: 'Исполнитель',
         createdAt: '	Дата создания	',
@@ -116,6 +118,7 @@ module.exports = {
         createTitle: 'Создание задачи',
         editTitle: 'Изменение задачи',
         actions: '',
+        editTitle: 'Изменить задачу',
       },
 
       welcome: {

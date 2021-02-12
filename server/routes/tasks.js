@@ -1,8 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
-// import Task from '../models/Task'
-const Task = require('../models/Task');
+import { getTask } from '../helpers/index.js';
 
 export default (app) => {
   app
@@ -23,7 +22,6 @@ export default (app) => {
         .innerJoin('statuses', 'statuses.id', 'tasks.statusId')
         .innerJoin('users as creator', 'creator.id', 'tasks.creatorId')
         .innerJoin('users as executor', 'executor.id', 'tasks.executorId');
-      console.log('tasks: ', tasks);
       reply.render('tasks/index', { tasks: tasks });
       return reply;
     })
@@ -53,5 +51,34 @@ export default (app) => {
         reply.render('/tasks/new', { task: req.body.data, errors: data });
         return reply;
       }
-    });
+    })
+    .get(
+      '/tasks/:id',
+      { name: 'taskDetails', preValidation: app.authenticate },
+      async (req, reply) => {
+        try {
+          const task = await getTask(app, req.params.id);
+          if (!task) {
+            throw Error('There is no task with such parametrs');
+          }
+          reply.render('tasks/details', { task });
+          return reply;
+        } catch ({ data }) {
+          req.flash('error', i18next.t('flash.tasks.detailsError'));
+          reply.redirect(app.reverse('tasks'));
+          return reply;
+        }
+      }
+    )
+    .get(
+      '/tasks/:id/edit',
+      { name: 'taskEdit', preValidation: app.authenticate },
+      async (req, reply) => {
+        const task = await getTask(app, req.params.id);
+        const users = await app.objection.models.user.query();
+        const statuses = await app.objection.models.status.query();
+        reply.render('tasks/edit', { task, users, statuses });
+        return reply;
+      }
+    );
 };
