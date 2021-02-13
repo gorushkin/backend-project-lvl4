@@ -9,6 +9,7 @@ describe('test users CRUD', () => {
   let app;
   let knex;
   let models;
+  let cookie;
   const testData = getTestData();
 
   beforeAll(async () => {
@@ -23,6 +24,7 @@ describe('test users CRUD', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
+    cookie = await getCookie(app, testData.users.existing);
   });
 
   it('"user list" template`s status code is 200', async () => {
@@ -44,7 +46,6 @@ describe('test users CRUD', () => {
   });
 
   it('"user edit" template`s status code is 200', async () => {
-    const cookie = await getCookie(app, testData.users.existing);
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
     const response = await app.inject({
@@ -76,8 +77,6 @@ describe('test users CRUD', () => {
   });
 
   it('user update', async () => {
-    const cookie = await getCookie(app, testData.users.existing);
-
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
     const updatedUserData = testData.users.updated;
@@ -100,14 +99,11 @@ describe('test users CRUD', () => {
   });
 
   it('user can not edit another user data', async () => {
-    const cookie = await getCookie(app, testData.users.existing);
-
     const existingUserData = testData.users.existing;
     const anotherUserData = testData.users.another;
     const user = await models.user.query().findOne({ email: anotherUserData.email });
     const { id } = user;
 
-    // const updatedUserData = testData.users.updated;
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('userEdit', { id }),
@@ -126,11 +122,35 @@ describe('test users CRUD', () => {
     expect(notUpdatedUser).toMatchObject(expected);
   });
 
-  it('user delete', async () => {
-    const cookie = await getCookie(app, testData.users.existing);
+  it('try patch another user profile', async () => {
+    const existingUserData = testData.users.existing;
+    const anotherUserData = testData.users.another;
+    const user = await models.user.query().findOne({ email: anotherUserData.email });
+    const { id } = user;
 
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('userUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: existingUserData,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const notUpdatedUser = await models.user.query().findOne({ id });
+    const expected = {
+      ..._.omit(notUpdatedUser, 'password'),
+      passwordDigest: encrypt(anotherUserData.password),
+    };
+    expect(notUpdatedUser).toMatchObject(expected);
+  });
+
+  it('user delete', async () => {
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
+
     const response = await app.inject({
       method: 'DELETE',
       url: app.reverse('userDelete', { id }),
@@ -144,8 +164,6 @@ describe('test users CRUD', () => {
   });
 
   it('user can not delete another user', async () => {
-    const cookie = await getCookie(app, testData.users.existing);
-
     const anotherUserData = testData.users.another;
     const anotherUser = await models.user.query().findOne({ email: anotherUserData.email });
     const { id } = anotherUser;
