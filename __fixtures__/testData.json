@@ -27,5 +27,24 @@
     "updated": {
       "name": "updated status1"
     }
+  },
+  "tasks": {
+    "new": {
+      "name": "new task",
+      "description": "new_task_description",
+      "statusId": 1,
+      "creatorId": 2,
+      "executorId": 1,
+      "isComplete": 0
+    },
+    "existing": {
+      "name": "task1"
+    },
+    "updated": {
+      "name": "updated task1"
+    },
+    "another": {
+      "name": "task3"
+    }
   }
 }

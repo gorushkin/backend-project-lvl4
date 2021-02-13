@@ -100,9 +100,10 @@ export default (app) => {
           return reply;
         }
       }
-    )    .delete(
-      '/tskss/:id',
-      { name: 'taskDelete', preValidation: app.authenticate },
+    )
+    .delete(
+      '/tasks/:id',
+      { name: 'taskDelete', preValidation: app.auth([app.checkIfUserCanDeleteTask, app.authenticate]), },
       async (req, reply) => {
         try {
           const task = await app.objection.models.task.query().findById(req.params.id);
@@ -113,6 +114,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      },
+      }
     );
 };
