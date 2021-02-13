@@ -24,6 +24,6 @@ block content
           td= formatDate(task.createdAt)
           td
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
-            form(action=route('statusDelete', {id: task.id}) method='post')
+            form(action=route('taskDelete', {id: task.id}) method='post')
               input(name='_method' type='hidden' value='delete')
               input.btn.btn-link(type='submit' value='Удалить')

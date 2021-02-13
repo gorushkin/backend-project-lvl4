@@ -80,5 +80,39 @@ export default (app) => {
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
       }
+    )
+    .patch(
+      '/tasks/:id',
+      { name: 'taskUpdate', preValidation: app.authenticate },
+      async (req, reply) => {
+        try {
+          const {
+            body: { data },
+          } = req;
+          const task = await app.objection.models.task.query().findById(req.params.id);
+          await task.$query().patch(data);
+          req.flash('success', i18next.t('flash.tasks.edit.success'));
+          reply.redirect('/tasks');
+          return reply;
+        } catch ({ data }) {
+          req.flash('error', i18next.t('flash.tasks.edit.error'));
+          reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
+          return reply;
+        }
+      }
+    )    .delete(
+      '/tskss/:id',
+      { name: 'taskDelete', preValidation: app.authenticate },
+      async (req, reply) => {
+        try {
+          const task = await app.objection.models.task.query().findById(req.params.id);
+          await task.$query().delete();
+          req.flash('info', i18next.t('flash.tasks.delete.success'));
+        } catch ({ data }) {
+          req.flash('error', i18next.t('flash.tasks.delete.error'));
+        }
+        reply.redirect('/tasks');
+        return reply;
+      },
     );
 };

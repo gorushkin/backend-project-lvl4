@@ -30,8 +30,8 @@ block content
             li
       .row.p-1
         .col
-          a(href='/tasks/43/edit') Изменить
-          form(action='/tasks/43' method='post')
+          a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
+          form(action=route('taskDelete', {id: task.id}) method='post')
             input(name='_method' type='hidden' value='delete')
             input.btn.btn-link(type='submit' value='Удалить')
 
