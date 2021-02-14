@@ -2,6 +2,7 @@
 
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
+import path from 'path';
 
 import encrypt from '../lib/secure.js';
 
@@ -22,6 +23,19 @@ export default class User extends unique(Model) {
         password: { type: 'string', minLength: 3 },
         firstname: { type: 'string', minLength: 1 },
         lastname: { type: 'string', minLength: 1 },
+      },
+    };
+  }
+
+  static get relationMappings() {
+    return {
+      tasks: {
+        relation: Model.HasManyRelation,
+        modelClass: path.join(__dirname, 'Task'),
+        join: {
+          from: 'users.id',
+          to: 'tasks.creator_id',
+        },
       },
     };
   }

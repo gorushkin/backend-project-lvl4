@@ -6,11 +6,11 @@ export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const tasks = await app.objection.models.task
-      .query()
-      .withGraphJoined('creator')
-      .withGraphJoined('executor')
-      .withGraphJoined('status');
-      reply.render('tasks/index', { tasks: tasks });
+        .query()
+        .withGraphJoined('creator')
+        .withGraphJoined('executor')
+        .withGraphJoined('status');
+      reply.render('tasks/index', { tasks });
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
@@ -20,7 +20,9 @@ export default (app) => {
       reply.render('tasks/new', { task, users, statuses });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const { name, description, statusId: statusId, executorId: executorId } = req.body.data;
+      const {
+        name, description, statusId, executorId,
+      } = req.body.data;
       try {
         const data = {
           name,
@@ -56,7 +58,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -67,7 +69,7 @@ export default (app) => {
         const statuses = await app.objection.models.status.query();
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
@@ -87,7 +89,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -105,6 +107,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };

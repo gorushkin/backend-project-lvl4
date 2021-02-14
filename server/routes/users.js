@@ -40,7 +40,10 @@ export default (app) => {
     })
     .patch(
       '/users/:id',
-      { name: 'userUpdate', preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]) },
+      {
+        name: 'userUpdate',
+        preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]),
+      },
       async (req, reply) => {
         try {
           const {
@@ -65,10 +68,14 @@ export default (app) => {
         preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]),
       },
       async (req, reply) => {
-        const usersTasks = await app.objection.models.user.query().findById(req.params.id).select('tasks.*').innerJoin('tasks', 'tasks.creatorId', 'users.id')
+        const usersTasks = await app.objection.models.user
+          .query()
+          .findById(req.params.id)
+          .select('tasks.*')
+          .innerJoin('tasks', 'tasks.creatorId', 'users.id');
         try {
           if (usersTasks) throw new Error('Нельяз удалить пользователя');
-          const user = await app.objection.models.user.query().findById(req.params.id)
+          const user = await app.objection.models.user.query().findById(req.params.id);
           await user.$query().delete();
           req.logOut();
           req.flash('info', i18next.t('flash.users.delete.success'));

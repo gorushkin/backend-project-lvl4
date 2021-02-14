@@ -110,7 +110,7 @@ module.exports = {
         edit: 'Изменить',
         creator: 'Автор',
         executor: 'Исполнитель',
-        createdAt: '	Дата создания	',
+        createdAt: 'Дата создания',
         new: {
           submit: 'Создать',
           signUp: 'Регистрация',
@@ -118,7 +118,6 @@ module.exports = {
         createTitle: 'Создание задачи',
         editTitle: 'Изменение задачи',
         actions: '',
-        editTitle: 'Изменить задачу',
       },
 
       welcome: {
