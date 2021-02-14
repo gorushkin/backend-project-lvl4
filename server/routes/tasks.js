@@ -1,27 +1,15 @@
 // @ts-check
 
 import i18next from 'i18next';
-import { getTask } from '../helpers/index.js';
 
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const tasks = await app.objection.models.task
-        .query()
-        .select(
-          'tasks.id',
-          'tasks.name',
-          'tasks.description',
-          'statuses.name as statusName',
-          'creator.firstname as creatorFirstName',
-          'creator.lastname as creatorLastName',
-          'executor.firstname as executorFirstName',
-          'executor.lastname as executorLastname',
-          'tasks.createdAt'
-        )
-        .innerJoin('statuses', 'statuses.id', 'tasks.statusId')
-        .innerJoin('users as creator', 'creator.id', 'tasks.creatorId')
-        .innerJoin('users as executor', 'executor.id', 'tasks.executorId');
+      .query()
+      .withGraphJoined('creator')
+      .withGraphJoined('executor')
+      .withGraphJoined('status');
       reply.render('tasks/index', { tasks: tasks });
       return reply;
     })
@@ -57,7 +45,7 @@ export default (app) => {
       { name: 'taskDetails', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const task = await getTask(app, req.params.id);
+          const task = await app.objection.models.task.getFullTaskInfo(req.params.id);
           if (!task) {
             throw Error('There is no task with such parametrs');
           }
@@ -74,7 +62,7 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const task = await getTask(app, req.params.id);
+        const task = await app.objection.models.task.getFullTaskInfo(req.params.id);
         const users = await app.objection.models.user.query();
         const statuses = await app.objection.models.status.query();
         reply.render('tasks/edit', { task, users, statuses });
@@ -103,7 +91,10 @@ export default (app) => {
     )
     .delete(
       '/tasks/:id',
-      { name: 'taskDelete', preValidation: app.auth([app.checkIfUserCanDeleteTask, app.authenticate]), },
+      {
+        name: 'taskDelete',
+        preValidation: app.auth([app.checkIfUserCanDeleteTask, app.authenticate]),
+      },
       async (req, reply) => {
         try {
           const task = await app.objection.models.task.query().findById(req.params.id);

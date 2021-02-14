@@ -28,23 +28,3 @@ export default (app) => ({
     return date.toLocaleString();
   },
 });
-
-const getTask = async (app, id) => {
-  const task = await app.objection.models.task
-    .query()
-    .findById(id)
-    .select(
-      'tasks.*',
-      'statuses.name as statusName',
-      'creator.firstname as creatorFirstName',
-      'creator.lastname as creatorLastName',
-      'executor.firstname as executorFirstName',
-      'executor.lastname as executorLastname',
-    )
-    .innerJoin('statuses', 'statuses.id', 'tasks.statusId')
-    .innerJoin('users as creator', 'creator.id', 'tasks.creatorId')
-    .innerJoin('users as executor', 'executor.id', 'tasks.executorId');
-  return task;
-};
-
-export { getTask };

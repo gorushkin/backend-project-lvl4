@@ -127,7 +127,7 @@ const registerPlugins = (app) => {
   });
 
   app.decorate('checkIfUserCanDeleteTask', async (request, reply, done) => {
-    const { creatorId } = await app.objection.models.task.query().findOne({ id: request.params.id });
+    const { creatorId } = await app.objection.models.task.query().findById(request.params.id);
     if (request.user.id === creatorId) {
       return done();
     }

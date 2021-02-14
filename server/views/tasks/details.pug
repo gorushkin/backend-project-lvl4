@@ -13,13 +13,13 @@ block content
     .container
       .row.p-1
         .col Автор
-        .col= `${task.creatorFirstName} ${task.creatorLastName}`
+        .col= `${task.creator.firstname} ${task.creator.lastname}`
       .row.p-1
         .col Исполнитель
-        .col= `${task.executorFirstName} ${task.executorLastname}`
+        .col= `${task.executor.firstname} ${task.executor.lastname}`
       .row.p-1
         .col Статус
-        .col= task.statusName
+        .col= task.status.name
       .row.p-1
         .col Дата создания
         .col= formatDate(task.createdAt)
