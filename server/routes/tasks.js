@@ -49,7 +49,7 @@ export default (app) => {
         try {
           const task = await app.objection.models.task.getFullTaskInfo(req.params.id);
           if (!task) {
-            throw Error('There is no task with such parametrs');
+            throw app.httpErrors.notFound('There is no task with such parametrs');
           }
           reply.render('tasks/details', { task });
           return reply;
@@ -95,7 +95,7 @@ export default (app) => {
       '/tasks/:id',
       {
         name: 'taskDelete',
-        preValidation: app.auth([app.checkIfUserCanDeleteTask, app.authenticate]),
+        preValidation: app.auth([app.checkIfUserCreatedTask, app.authenticate]),
       },
       async (req, reply) => {
         try {

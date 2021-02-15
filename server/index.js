@@ -124,7 +124,7 @@ const registerPlugins = (app) => {
     return reply;
   });
 
-  app.decorate('checkIfUserCanDeleteTask', async (request, reply, done) => {
+  app.decorate('checkIfUserCreatedTask', async (request, reply, done) => {
     const { creatorId } = await app.objection.models.task.query().findById(request.params.id);
     if (request.user.id === creatorId) {
       return done();
@@ -136,7 +136,11 @@ const registerPlugins = (app) => {
 };
 
 export default () => {
-  const app = fastify();
+  const app = fastify({
+    logger: {
+      prettyPrint: isDevelopment,
+    },
+  });
 
   registerPlugins(app);
 
