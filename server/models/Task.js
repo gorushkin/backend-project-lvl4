@@ -22,7 +22,6 @@ export default class Task extends unique(Model) {
         creator_id: { type: 'integer' },
         status_id: { type: 'integer' },
         executor_Id: { type: 'integer' },
-        isComplete: { type: 'boolean', default: false },
       },
     };
   }

@@ -5,8 +5,7 @@
     "description": "task1_description",
     "statusId": "1",
     "creatorId": "4",
-    "executorId": "1",
-    "isComplete": false
+    "executorId": "1"
   },
   {
     "id": 2,
@@ -14,8 +13,7 @@
     "description": "task2_description",
     "statusId": "1",
     "creatorId": "1",
-    "executorId": "1",
-    "isComplete": false
+    "executorId": "1"
   },
   {
     "id": 3,
@@ -23,7 +21,6 @@
     "description": "task3_description",
     "statusId": 1,
     "creatorId": 1,
-    "executorId": 1,
-    "isComplete": false
+    "executorId": 1
   }
 ]
