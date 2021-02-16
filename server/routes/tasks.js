@@ -1,7 +1,5 @@
 // @ts-check
 
-import _ from 'lodash';
-
 import i18next from 'i18next';
 
 export default (app) => {
@@ -22,7 +20,9 @@ export default (app) => {
       reply.render('tasks/new', { task, users, statuses });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const { name, description, statusId, executorId } = req.body.data;
+      const {
+        name, description, statusId, executorId,
+      } = req.body.data;
       try {
         const data = {
           name,
@@ -63,7 +63,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -79,7 +79,7 @@ export default (app) => {
         ]);
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
@@ -99,7 +99,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -117,6 +117,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };
