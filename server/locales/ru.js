@@ -121,8 +121,6 @@ module.exports = {
         name: 'Наименование',
         status: 'Статус',
         edit: 'Изменить',
-        creator: 'Автор',
-        executor: 'Исполнитель',
         createdAt: 'Дата создания',
         labels: 'Метки:',
         new: {
