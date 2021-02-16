@@ -54,12 +54,4 @@ export default class Task extends unique(Model) {
       },
     };
   }
-
-  static getFullTaskInfo(id) {
-    return this.query()
-      .findById(id)
-      .withGraphJoined('creator')
-      .withGraphJoined('executor')
-      .withGraphJoined('status');
-  }
 }

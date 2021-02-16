@@ -1,5 +1,7 @@
 // @ts-check
 
+import _ from 'lodash';
+
 import i18next from 'i18next';
 
 export default (app) => {
@@ -7,22 +9,20 @@ export default (app) => {
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const tasks = await app.objection.models.task
         .query()
-        .withGraphJoined('creator')
-        .withGraphJoined('executor')
-        .withGraphJoined('status');
+        .withGraphJoined('[creator, executor, status]');
       reply.render('tasks/index', { tasks });
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
-      const task = new app.objection.models.task();
-      const users = await app.objection.models.user.query();
-      const statuses = await app.objection.models.status.query();
+      const [task, users, statuses] = await Promise.all([
+        new app.objection.models.task(),
+        await app.objection.models.user.query(),
+        await app.objection.models.status.query(),
+      ]);
       reply.render('tasks/new', { task, users, statuses });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const {
-        name, description, statusId, executorId,
-      } = req.body.data;
+      const { name, description, statusId, executorId } = req.body.data;
       try {
         const data = {
           name,
@@ -47,29 +47,39 @@ export default (app) => {
       { name: 'taskDetails', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const task = await app.objection.models.task.getFullTaskInfo(req.params.id);
+          const task = await app.objection.models.task
+            .query()
+            .findById(req.params.id)
+            .withGraphJoined('[creator, executor, status]');
           if (!task) {
-            throw app.httpErrors.notFound('There is no task with such parametrs');
+            req.flash('error', i18next.t('flash.tasks.detailsError'));
+            reply.redirect(app.reverse('tasks'));
+          } else {
+            reply.render('tasks/details', { task });
           }
-          reply.render('tasks/details', { task });
           return reply;
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.tasks.detailsError'));
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      },
+      }
     )
     .get(
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const task = await app.objection.models.task.getFullTaskInfo(req.params.id);
-        const users = await app.objection.models.user.query();
-        const statuses = await app.objection.models.status.query();
+        const [task, users, statuses] = await Promise.all([
+          await app.objection.models.task
+            .query()
+            .findById(req.params.id)
+            .withGraphJoined('[creator, executor, status]'),
+          await app.objection.models.user.query(),
+          await app.objection.models.status.query(),
+        ]);
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
-      },
+      }
     )
     .patch(
       '/tasks/:id',
@@ -89,7 +99,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      },
+      }
     )
     .delete(
       '/tasks/:id',
@@ -107,6 +117,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      },
+      }
     );
 };
