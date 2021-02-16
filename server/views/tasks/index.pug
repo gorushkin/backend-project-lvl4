@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a.nav-link(href='/tasks/new') Создать задачу
+  a.nav-link(href='/tasks/new')= t('views.tasks.create')
   table.table.table-striped
     thead
       tr
@@ -26,4 +26,4 @@ block content
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
             form(action=route('taskDelete', {id: task.id}) method='post')
               input(name='_method' type='hidden' value='delete')
-              input.btn.btn-link(type='submit' value='Удалить')
+              input.btn.btn-link(type='submit' value=t('views.tasks.delete'))
