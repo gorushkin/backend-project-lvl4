@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a.nav-link(href='/tasks/new') Создать задачу
+  a.nav-link(href='/tasks/new')= t('views.tasks.create')
   table.table.table-striped
     thead
       tr
@@ -18,12 +18,12 @@ block content
           td= task.id
           td
             a(href=route('taskDetails', {id: task.id}))= task.name
-          td= task.statusName
-          td= `${task.creatorFirstName} ${task.creatorLastName}`
-          td= `${task.executorFirstName} ${task.executorLastname}`
+          td= task.status.name
+          td= `${task.creator.firstname} ${task.creator.lasttname}`
+          td= `${task.executor.firstname} ${task.executor.lasttname}`
           td= formatDate(task.createdAt)
           td
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
             form(action=route('taskDelete', {id: task.id}) method='post')
               input(name='_method' type='hidden' value='delete')
-              input.btn.btn-link(type='submit' value='Удалить')
+              input.btn.btn-link(type='submit' value=t('views.tasks.delete'))

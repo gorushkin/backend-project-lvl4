@@ -64,9 +64,17 @@ export default (app) => {
       { name: 'statusDelete', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const status = await app.objection.models.status.query().findById(req.params.id);
-          await status.$query().delete();
-          req.flash('info', i18next.t('flash.statuses.delete.success'));
+          const statusTasks = await app.objection.models.task
+            .query()
+            .withGraphJoined('status')
+            .where('tasks.status_id', '=', req.params.id);
+          if (statusTasks.length !== 0) {
+            req.flash('error', i18next.t('flash.statuses.delete.error'));
+          } else {
+            const status = await app.objection.models.status.query().findById(req.params.id);
+            await status.$query().delete();
+            req.flash('info', i18next.t('flash.statuses.delete.success'));
+          }
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.statuses.delete.error'));
         }

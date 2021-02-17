@@ -14,7 +14,7 @@ block content
         each status in statuses
           option(value=status.id)= status.name
     .form-group
-      label(for='data_executorId') Исполнитель
+      label(for='data_executorId')= t('views.tasks.executor')
       select#data_executorId.form-control(name='data[executorId]')
         option
         each user in users

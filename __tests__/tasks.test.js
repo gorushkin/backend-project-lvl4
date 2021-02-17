@@ -22,10 +22,10 @@ describe('test statuses CRUD', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
-    cookie = await getCookie(app, testData.users.existing);
+    cookie = await getCookie(app, testData.users.another);
   });
 
-  it('Get tasks page work', async () => {
+  it('Get status code 200 on /tasks', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('tasks'),
@@ -35,7 +35,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get tasks create page work', async () => {
+  it('Get status code 200 on /tasks/new', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newTask'),
@@ -45,7 +45,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get tasks edit page work', async () => {
+  it('Get status code 200 on /tasks/:id/edit', async () => {
     const exsistingTaskData = testData.tasks.existing;
     const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
 
@@ -58,7 +58,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get tasks details page work', async () => {
+  it('Get status code 200 on /tasks/:id', async () => {
     const exsistingTaskData = testData.tasks.existing;
     const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
 
@@ -71,7 +71,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Can not get tasks page work with unauthorized guest', async () => {
+  it('Get status code 302 with unauthorized request', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('tasks'),
@@ -115,7 +115,7 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const updatedTask = await models.task.query().findOne({ id });
+    const updatedTask = await models.task.query().findById(id);
     expect(updatedTask).toMatchObject(updatedTaskData);
   });
 
@@ -131,11 +131,11 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const deletedTask = await models.task.query().findOne({ id });
+    const deletedTask = await models.task.query().findById(id);
     expect(deletedTask).toBeUndefined();
   });
 
-  it('Can not delete status with that belongs to anothet user', async () => {
+  it('Can not delete task that belongs to anothet user', async () => {
     const anotherTaskData = testData.tasks.another;
     const anotherTask = await models.task.query().findOne({ name: anotherTaskData.name });
     const { id } = anotherTask;
@@ -147,8 +147,8 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const undeletedtask = await models.task.query().findOne({ id });
-    expect(anotherTask).toMatchObject(undeletedtask);
+    const undeletedTask = await models.task.query().findById(id);
+    expect(anotherTask).toMatchObject(undeletedTask);
   });
 
   afterEach(async () => {

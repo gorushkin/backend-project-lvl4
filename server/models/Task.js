@@ -1,5 +1,5 @@
 // @ts-check
-
+import path from 'path';
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
 
@@ -22,19 +22,15 @@ export default class Task extends unique(Model) {
         creator_id: { type: 'integer' },
         status_id: { type: 'integer' },
         executor_Id: { type: 'integer' },
-        isComplete: { type: 'boolean', default: false },
       },
     };
   }
 
   static get relationMappings() {
-    const User = require('./User');
-    const Status = require('./Status');
-
     return {
       creator: {
         relation: Model.BelongsToOneRelation,
-        modelClass: User,
+        modelClass: path.join(__dirname, 'User'),
         join: {
           from: 'tasks.creator_id',
           to: 'users.id',
@@ -42,7 +38,7 @@ export default class Task extends unique(Model) {
       },
       executor: {
         relation: Model.BelongsToOneRelation,
-        modelClass: User,
+        modelClass: path.join(__dirname, 'User'),
         join: {
           from: 'tasks.executor_id',
           to: 'users.id',
@@ -50,7 +46,7 @@ export default class Task extends unique(Model) {
       },
       status: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Status,
+        modelClass: path.join(__dirname, 'Status'),
         join: {
           from: 'tasks.status_id',
           to: 'statuses.id',
