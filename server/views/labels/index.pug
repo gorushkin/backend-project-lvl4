@@ -1,0 +1,11 @@
+extends ../layouts/application.pug
+
+block content
+  a.nav-link(href='/labels/new') Создать метку
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.labels.id')
+        th= t('views.labels.name')
+        th= t('views.labels.createdAt')
+        th= t('views.labels.actions')

@@ -64,6 +64,7 @@ module.exports = {
         users: 'Пользователи',
         statuses: 'Статусы',
         tasks: 'Задачи',
+        labels: 'Метки',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -120,7 +121,19 @@ module.exports = {
         actions: '',
         editTitle: 'Изменить задачу',
       },
-
+      labels: {
+        id: 'ID',
+        name: 'Наименование',
+        edit: 'Изменить',
+        createdAt: '	Дата создания	',
+        new: {
+          submit: 'Создать',
+        },
+        createTitle: 'Создание метки',
+        editTitle: 'Изменение метки',
+        actions: '',
+        editTitle: 'Изменить метку',
+      },
       welcome: {
         index: {
           hello: 'Привет от Хекслета!',
