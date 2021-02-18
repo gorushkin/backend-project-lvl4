@@ -27,4 +27,7 @@ export default (app) => ({
     const date = new Date(str);
     return date.toLocaleString();
   },
+  checkLabel(id, taskLabelId) {
+    return _.includes(taskLabelId, id);
+  },
 });

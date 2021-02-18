@@ -92,15 +92,21 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const [task, users, statuses] = await Promise.all([
+        console.log('----------------------------------------');
+        const [task, users, statuses, labels, taskLabels] = await Promise.all([
           await app.objection.models.task
             .query()
             .findById(req.params.id)
             .withGraphJoined('[creator, executor, status]'),
           await app.objection.models.user.query(),
           await app.objection.models.status.query(),
+          await app.objection.models.label.query(),
+          await (await app.objection.models.task.query().findById(req.params.id)).$relatedQuery(
+            'labels'
+          ),
         ]);
-        reply.render('tasks/edit', { task, users, statuses });
+        const taskLabelId = taskLabels.map(({ id }) => id);
+        reply.render('tasks/edit', { task, users, statuses, labels, taskLabelId });
         return reply;
       }
     )
