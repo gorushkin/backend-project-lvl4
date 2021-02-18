@@ -19,8 +19,11 @@ block content
           td
             a(href=route('taskDetails', {id: task.id}))= task.name
           td= task.status.name
-          td= `${task.creator.firstname} ${task.creator.lasttname}`
-          td= `${task.executor.firstname} ${task.executor.lasttname}`
+          td= `${task.creator.firstname} ${task.creator.lastname}`
+          if task.executor
+            td= `${task.executor.firstname} ${task.executor.lastname}`
+          else
+            td
           td= formatDate(task.createdAt)
           td
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')

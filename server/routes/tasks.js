@@ -133,7 +133,10 @@ export default (app) => {
       async (req, reply) => {
         try {
           const task = await app.objection.models.task.query().findById(req.params.id);
-          await task.$query().delete();
+          await app.objection.models.task.transaction(async (trx) => {
+            await task.$query().delete();
+            await task.$relatedQuery('labels').unrelate();
+          });
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.tasks.delete.error'));
