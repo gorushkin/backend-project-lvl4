@@ -29,7 +29,11 @@ export default (app) => {
       reply.render('tasks/new', { task, users, statuses, labels });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const { name, description, statusId, executorId, labels } = req.body.data;
+      const {
+        body: {
+          data: { name, description, statusId, executorId, labels },
+        },
+      } = req;
       try {
         const data = {
           name,
@@ -38,15 +42,19 @@ export default (app) => {
           creator_id: req.user.id,
           executor_id: parseInt(executorId, 10),
         };
-        const task = await app.objection.models.task.fromJson(data);
-        const labelsIdList = getLabelIdList(labels);
-        const { id } = await app.objection.models.task.query().insert(task);
 
-        await Promise.all(
-          labelsIdList.map((labelId) =>
-            app.objection.models.task.relatedQuery('labels').for(id).relate(labelId)
-          )
-        );
+        const task = await app.objection.models.task.fromJson(data);
+        const labelsId = getLabelIdList(labels);
+
+        await app.objection.models.task.transaction(async (trx) => {
+          const { id } = await app.objection.models.task.query(trx).insert(task);
+
+          Promise.all(
+            labelsId.map((labelId) => {
+              return app.objection.models.task.relatedQuery('labels').for(id).relate(labelId);
+            })
+          );
+        });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('root'));
