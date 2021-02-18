@@ -65,8 +65,13 @@ export default (app) => {
       async (req, reply) => {
         try {
           const label = await app.objection.models.label.query().findById(req.params.id);
-          await label.$query().delete();
-          req.flash('info', i18next.t('flash.labels.delete.success'));
+          const tasks = await label.$relatedQuery('tasks');
+          if (tasks.length !== 0) {
+            req.flash('error', i18next.t('flash.labels.delete.error'));
+          } else {
+            await label.$query().delete();
+            req.flash('info', i18next.t('flash.labels.delete.success'));
+          }
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.labels.delete.error'));
         }
