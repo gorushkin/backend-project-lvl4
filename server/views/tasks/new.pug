@@ -19,5 +19,10 @@ block content
         option
         each user in users
           option(value=user.id)= `${user.firstname} ${user.lastname}`
+    .form-group
+      label(for='data_labels')= t('views.tasks.labels')
+      select.form-control(id='data_labels' name='data[labels]' multiple='multiple')
+        each label in labels
+          option(value=label.id)= label.name
 
     +submit(task)(value=t('views.tasks.new.submit'))

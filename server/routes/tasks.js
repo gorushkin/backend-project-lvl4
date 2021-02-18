@@ -2,6 +2,14 @@
 
 import i18next from 'i18next';
 
+const getLabelIdList = (labels) => {
+  const labelMatching = {
+    string: (id) => [parseInt(id, 10)],
+    object: (labels) => labels.map((id) => parseInt(id, 10)),
+  };
+  return labelMatching[typeof labels](labels);
+};
+
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
@@ -12,17 +20,16 @@ export default (app) => {
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
-      const [task, users, statuses] = await Promise.all([
+      const [task, users, statuses, labels] = await Promise.all([
         new app.objection.models.task(),
         await app.objection.models.user.query(),
         await app.objection.models.status.query(),
+        await app.objection.models.label.query(),
       ]);
-      reply.render('tasks/new', { task, users, statuses });
+      reply.render('tasks/new', { task, users, statuses, labels });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      const {
-        name, description, statusId, executorId,
-      } = req.body.data;
+      const { name, description, statusId, executorId, labels } = req.body.data;
       try {
         const data = {
           name,
@@ -32,7 +39,15 @@ export default (app) => {
           executor_id: parseInt(executorId, 10),
         };
         const task = await app.objection.models.task.fromJson(data);
-        await app.objection.models.task.query().insert(task);
+        const labelsIdList = getLabelIdList(labels);
+        const { id } = await app.objection.models.task.query().insert(task);
+
+        await Promise.all(
+          labelsIdList.map((labelId) =>
+            app.objection.models.task.relatedQuery('labels').for(id).relate(labelId)
+          )
+        );
+
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('root'));
         return reply;
@@ -63,7 +78,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      },
+      }
     )
     .get(
       '/tasks/:id/edit',
@@ -79,7 +94,7 @@ export default (app) => {
         ]);
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
-      },
+      }
     )
     .patch(
       '/tasks/:id',
@@ -99,7 +114,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      },
+      }
     )
     .delete(
       '/tasks/:id',
@@ -117,6 +132,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      },
+      }
     );
 };
