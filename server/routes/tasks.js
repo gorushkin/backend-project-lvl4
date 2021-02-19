@@ -72,8 +72,7 @@ export default (app) => {
         const [task, users, statuses] = await Promise.all([
           app.objection.models.task
             .query()
-            .findById(req.params.id)
-            .withGraphJoined('[creator, executor, status]'),
+            .findById(req.params.id),
           app.objection.models.user.query(),
           app.objection.models.status.query(),
         ]);
