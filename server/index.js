@@ -103,10 +103,11 @@ const registerPlugins = (app) => {
   app.register(fastifyPassport.initialize());
   app.register(fastifyPassport.secureSession());
   app.decorate('fp', fastifyPassport);
-  app.decorate('authenticate', (...args) => fastifyPassport.authenticate('form', {
-    failureRedirect: app.reverse('root'),
-    failureFlash: i18next.t('flash.authError'),
-  })(...args));
+  app.decorate('authenticate', (...args) => fastifyPassport
+    .authenticate('form', {
+      failureRedirect: app.reverse('root'),
+      failureFlash: i18next.t('flash.authError'),
+    })(...args));
 
   app.register(fastifyMethodOverride);
   app.register(fastifyObjectionjs, {
@@ -120,6 +121,16 @@ const registerPlugins = (app) => {
     }
     request.flash('error', i18next.t('flash.users.authError'));
     reply.redirect('/users');
+    return reply;
+  });
+
+  app.decorate('checkIfUserCreatedTask', async (request, reply, done) => {
+    const { creatorId } = await app.objection.models.task.query().findById(request.params.id);
+    if (request.user.id === creatorId) {
+      return done();
+    }
+    request.flash('error', i18next.t('flash.tasks.authError'));
+    reply.redirect('/tasks');
     return reply;
   });
 };

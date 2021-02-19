@@ -40,7 +40,10 @@ export default (app) => {
     })
     .patch(
       '/users/:id',
-      { name: 'userUpdate', preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]) },
+      {
+        name: 'userUpdate',
+        preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]),
+      },
       async (req, reply) => {
         try {
           const {
@@ -66,10 +69,18 @@ export default (app) => {
       },
       async (req, reply) => {
         try {
-          const user = await app.objection.models.user.query().findById(req.params.id);
-          await user.$query().delete();
-          req.logOut();
-          req.flash('info', i18next.t('flash.users.delete.success'));
+          const usersTasks = await app.objection.models.user
+            .query()
+            .findById(req.params.id)
+            .withGraphJoined('tasks');
+          if (usersTasks.tasks.length !== 0) {
+            req.flash('error', i18next.t('flash.users.delete.error'));
+          } else {
+            const user = await app.objection.models.user.query().findById(req.params.id);
+            await user.$query().delete();
+            req.logOut();
+            req.flash('info', i18next.t('flash.users.delete.success'));
+          }
           reply.redirect('/users');
           return reply;
         } catch ({ data }) {

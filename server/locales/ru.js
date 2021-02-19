@@ -41,16 +41,41 @@ module.exports = {
         },
         authError: 'Вы не можете редактировать или удалять другого пользователя',
       },
+      tasks: {
+        create: {
+          error: 'Не удалось создать задачу',
+          success: 'Задача успешно создана',
+        },
+        edit: {
+          error: 'Не удалось изменить задачу',
+          success: 'Задача успешно создан изменена',
+        },
+        delete: {
+          error: 'Не удалось удалить задачу',
+          success: 'Задача успешно удалёна',
+        },
+        authError: 'Задачу может удалить только ее автор',
+        detailsError: 'Нет задачи с такими параметрами',
+      },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
     },
     layouts: {
       application: {
         users: 'Пользователи',
         statuses: 'Статусы',
+        tasks: 'Задачи',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
       },
+    },
+    form: {
+      name: 'Наименование',
+      email: 'Email',
+      description: 'Описание',
+      firstname: 'Имя',
+      lastname: 'Фамилия',
+      password: 'Пароль',
     },
     views: {
       session: {
@@ -71,6 +96,7 @@ module.exports = {
           submit: 'Сохранить',
           signUp: 'Регистрация',
         },
+        delete: 'Удалить',
         editTitle: 'Изменение пользователя',
       },
       statuses: {
@@ -83,9 +109,31 @@ module.exports = {
           submit: 'Создать',
           signUp: 'Регистрация',
         },
+        create: ' Создать статус',
+        delete: 'Удалить',
         createTitle: 'Создание статуса',
         editTitle: 'Изменение статуса',
       },
+      tasks: {
+        id: 'ID',
+        creator: 'Автор',
+        executor: 'Исполнитель',
+        name: 'Наименование',
+        status: 'Статус',
+        edit: 'Изменить',
+        createdAt: 'Дата создания',
+        labels: 'Метки:',
+        new: {
+          submit: 'Создать',
+          signUp: 'Регистрация',
+        },
+        delete: 'Удалить',
+        create: 'Создать задачу',
+        createTitle: 'Создание задачи',
+        editTitle: 'Изменение задачи',
+        actions: '',
+      },
+
       welcome: {
         index: {
           hello: 'Привет от Хекслета!',
