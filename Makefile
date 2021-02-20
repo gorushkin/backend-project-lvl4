@@ -27,6 +27,9 @@ lint:
 test:
 	npm test -s
 
+test-coverage:
+	npm test -- --coverage
+
 image-build:
 	docker build --tag task-manager:dev -f ./Dockerfile .
 
