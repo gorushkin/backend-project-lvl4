@@ -12,10 +12,10 @@ export default (app) => {
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
-      const [task, users, statuses] = await Promise.all([
-        new app.objection.models.task(),
-        await app.objection.models.user.query(),
-        await app.objection.models.status.query(),
+      const task = new app.objection.models.task();
+      const [users, statuses] = await Promise.all([
+        app.objection.models.user.query(),
+        app.objection.models.status.query(),
       ]);
       reply.render('tasks/new', { task, users, statuses });
     })
@@ -70,12 +70,11 @@ export default (app) => {
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
         const [task, users, statuses] = await Promise.all([
-          await app.objection.models.task
+          app.objection.models.task
             .query()
-            .findById(req.params.id)
-            .withGraphJoined('[creator, executor, status]'),
-          await app.objection.models.user.query(),
-          await app.objection.models.status.query(),
+            .findById(req.params.id),
+          app.objection.models.user.query(),
+          app.objection.models.status.query(),
         ]);
         reply.render('tasks/edit', { task, users, statuses });
         return reply;
