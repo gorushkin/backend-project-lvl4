@@ -2,12 +2,12 @@
 
 import i18next from 'i18next';
 
-const getLabelIdList = (labels) => {
-  const labelMatching = {
+const getLabelIdList = (labels = []) => {
+  const labelIdFormatMatching = {
     string: (id) => [parseInt(id, 10)],
-    object: (labels) => labels.map((id) => parseInt(id, 10)),
+    object: (labelsId) => labelsId.map((id) => parseInt(id, 10)),
   };
-  return labelMatching[typeof labels](labels);
+  return labelIdFormatMatching[typeof labels](labels);
 };
 
 export default (app) => {
@@ -41,6 +41,7 @@ export default (app) => {
           },
         },
       } = req;
+
       try {
         const data = {
           name,
