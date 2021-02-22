@@ -2,6 +2,31 @@ extends ../layouts/application.pug
 
 block content
   a.nav-link(href='/tasks/new')= t('views.tasks.create')
+  .jumbotron.p-2
+    form.form-inline(action='/tasks' method='get')
+      .form-group
+        label(for='data_status')= t('views.tasks.status')
+        select#data_status.form-control.ml-2.mr-3(name='status')
+          option
+          each status in statuses
+            option(value=status.id)= status.name
+      .form-group
+        label(for='data_executor')= t('views.tasks.executor')
+        select#data_executor.form-control.ml-2.mr-3(name='executor')
+          option
+          each user in users
+            option(value=user.id)= `${user.firstname} ${user.lastname}`
+      .form-group
+        label(for='data_label')= t('views.tasks.labels')
+        select#data_label.form-control.ml-2.mr-3(name='label')
+          option
+          each label in labels
+            option(value=label.id)= label.name
+      .form-group.form-check
+        input#data_isCreatorUser.form-check-input(type='checkbox' name='isCreatorUser')
+        label.form-check-label(for='data_isCreatorUser')= t('views.tasks.isCreatorUser')
+      .form-group
+        input.btn.btn-primary.ml-3(type='submit' value=t('views.tasks.filter'))
   table.table.table-striped
     thead
       tr

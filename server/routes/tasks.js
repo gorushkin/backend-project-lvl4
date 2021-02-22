@@ -13,10 +13,18 @@ const getLabelIdList = (labels = []) => {
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      const tasks = await app.objection.models.task
-        .query()
-        .withGraphJoined('[creator, executor, status]');
-      reply.render('tasks/index', { tasks });
+      // const tasks2 = await app.objection.models.task
+      //   .query()
+      //   .withGraphJoined('[creator, executor, status]');
+      const [tasks, users, statuses, labels] = await Promise.all([
+        app.objection.models.task.query().withGraphJoined('[creator, executor, status]'),
+        app.objection.models.user.query(),
+        app.objection.models.status.query(),
+        app.objection.models.label.query(),
+      ]);
+      reply.render('tasks/index', {
+        tasks, users, statuses, labels,
+      });
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
