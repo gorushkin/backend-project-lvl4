@@ -27,7 +27,8 @@ block content
         .col
           h6= t('views.tasks.labels')
           ul
-            li
+            each label in task.labels
+              li= label.name
       .row.p-1
         .col
           a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
