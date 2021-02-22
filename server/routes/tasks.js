@@ -28,11 +28,11 @@ export default (app) => {
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
-      const [task, users, statuses, labels] = await Promise.all([
-        new app.objection.models.task(),
-        await app.objection.models.user.query(),
-        await app.objection.models.status.query(),
-        await app.objection.models.label.query(),
+      const task = new app.objection.models.task();
+      const [users, statuses, labels] = await Promise.all([
+        app.objection.models.user.query(),
+        app.objection.models.status.query(),
+        app.objection.models.label.query(),
       ]);
       reply.render('tasks/new', {
         task,
@@ -107,16 +107,13 @@ export default (app) => {
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
         const [task, users, statuses, labels, taskLabels] = await Promise.all([
-          await app.objection.models.task
+          app.objection.models.task
             .query()
-            .findById(req.params.id)
-            .withGraphJoined('[creator, executor, status]'),
-          await app.objection.models.user.query(),
-          await app.objection.models.status.query(),
-          await app.objection.models.label.query(),
-          await (await app.objection.models.task.query().findById(req.params.id)).$relatedQuery(
-            'labels',
-          ),
+            .findById(req.params.id),
+          app.objection.models.user.query(),
+          app.objection.models.status.query(),
+          app.objection.models.label.query(),
+          (await app.objection.models.task.query().findById(req.params.id)).$relatedQuery('labels'),
         ]);
         const taskLabelId = taskLabels.map(({ id }) => id);
         reply.render('tasks/edit', {
