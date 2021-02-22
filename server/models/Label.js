@@ -31,7 +31,7 @@ export default class Label extends unique(Model) {
           from: 'labels.id',
           through: {
             from: 'tasks_labels.label_id',
-            to: 'tasks_labels.task_id'
+            to: 'tasks_labels.task_id',
           },
           to: 'tasks.id',
         },

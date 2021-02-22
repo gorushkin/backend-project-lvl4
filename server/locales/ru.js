@@ -154,7 +154,7 @@ module.exports = {
         id: 'ID',
         name: 'Наименование',
         edit: 'Изменить',
-        createdAt: '	Дата создания	',
+        createdAt: 'Дата создания',
         new: {
           submit: 'Создать',
         },
@@ -163,7 +163,6 @@ module.exports = {
         editTitle: 'Изменение метки',
         actions: '',
         create: 'Создать метку',
-        editTitle: 'Изменить метку',
       },
       welcome: {
         index: {
