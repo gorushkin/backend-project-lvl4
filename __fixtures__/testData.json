@@ -45,5 +45,16 @@
     "another": {
       "name": "task3"
     }
+  },
+  "labels": {
+    "new": {
+      "name": "new label"
+    },
+    "existing": {
+      "name": "label1"
+    },
+    "updated": {
+      "name": "updated label1"
+    }
   }
 }

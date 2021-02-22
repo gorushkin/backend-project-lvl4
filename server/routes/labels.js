@@ -28,7 +28,7 @@ export default (app) => {
           reply.render('/labels/new', { label: req.body.data, errors: data });
           return reply;
         }
-      }
+      },
     )
     .get(
       '/labels/:id/edit',
@@ -37,7 +37,7 @@ export default (app) => {
         const label = await app.objection.models.label.query().findById(req.params.id);
         reply.render('labels/edit', { label });
         return reply;
-      }
+      },
     )
     .patch(
       '/labels/:id',
@@ -57,7 +57,7 @@ export default (app) => {
           reply.redirect(app.reverse('labelEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/labels/:id',
@@ -77,6 +77,6 @@ export default (app) => {
         }
         reply.redirect('/labels');
         return reply;
-      }
+      },
     );
 };
