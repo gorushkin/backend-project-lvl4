@@ -25,7 +25,6 @@ export default (app) => {
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
-
       ]);
       reply.render('tasks/new', {
         task,
@@ -99,9 +98,7 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const task = await app.objection.models.task
-          .query()
-          .findById(req.params.id);
+        const task = await app.objection.models.task.query().findById(req.params.id);
         const [users, statuses, labels, taskLabels] = await Promise.all([
           app.objection.models.user.query(),
           app.objection.models.status.query(),
@@ -148,8 +145,12 @@ export default (app) => {
       async (req, reply) => {
         try {
           const task = await app.objection.models.task.query().findById(req.params.id);
-          await task.$query().delete();
-          await task.$relatedQuery('labels').unrelate();
+          await app.objection.models.task.transaction(async (trx) => {
+            await Promise.all([
+              task.$query(trx).delete(),
+              task.$relatedQuery('labels', trx).unrelate(),
+            ]);
+          });
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.tasks.delete.error'));
