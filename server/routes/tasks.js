@@ -63,15 +63,14 @@ export default (app) => {
         const labelsId = getLabelIdList(labels);
 
         await app.objection.models.task.transaction(async (trx) => {
-          const { id } = await app.objection.models.task.query(trx).insert(task);
-
-          Promise.all(
-            labelsId.map((labelId) => app.objection.models.task.relatedQuery('labels').for(id).relate(labelId)),
+          const insertedTask = await app.objection.models.task.query(trx).insert(task);
+          await Promise.all(
+            labelsId.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId)),
           );
         });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect(app.reverse('root'));
+        reply.redirect(app.reverse('tasks'));
         return reply;
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.task.create.error'));
@@ -106,14 +105,12 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const [task, users, statuses, labels, taskLabels] = await Promise.all([
-          app.objection.models.task
-            .query()
-            .findById(req.params.id),
+        const task = await app.objection.models.task.query().findById(req.params.id);
+        const [users, statuses, labels, taskLabels] = await Promise.all([
           app.objection.models.user.query(),
           app.objection.models.status.query(),
           app.objection.models.label.query(),
-          (await app.objection.models.task.query().findById(req.params.id)).$relatedQuery('labels'),
+          task.$relatedQuery('labels'),
         ]);
         const taskLabelId = taskLabels.map(({ id }) => id);
         reply.render('tasks/edit', {
@@ -155,8 +152,12 @@ export default (app) => {
       async (req, reply) => {
         try {
           const task = await app.objection.models.task.query().findById(req.params.id);
-          await task.$query().delete();
-          await task.$relatedQuery('labels').unrelate();
+          await app.objection.models.task.transaction(async (trx) => {
+            await Promise.all([
+              task.$query(trx).delete(),
+              task.$relatedQuery('labels', trx).unrelate(),
+            ]);
+          });
           req.flash('info', i18next.t('flash.tasks.delete.success'));
         } catch ({ data }) {
           req.flash('error', i18next.t('flash.tasks.delete.error'));
