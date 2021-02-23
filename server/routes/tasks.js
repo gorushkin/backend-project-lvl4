@@ -10,20 +10,45 @@ const getLabelIdList = (labels = []) => {
   return labelIdFormatMatching[typeof labels](labels);
 };
 
+const getQuery = (app, query) => {
+  const queryMatching = {
+    executor: 'executor.id',
+    isCreatorUser: 'creator.id',
+    status: 'status.id',
+    label: 'labels.id',
+  };
+
+  const defaultQuery = app.objection.models.task
+    .query()
+    .withGraphJoined('[creator, executor, status, labels]');
+  return Object.entries(query).reduce((func, [key, value]) => {
+    if (!value) {
+      return func;
+    }
+    return func.where(queryMatching[key], value);
+  }, defaultQuery);
+};
+
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      // const tasks2 = await app.objection.models.task
-      //   .query()
-      //   .withGraphJoined('[creator, executor, status]');
+      const { query } = req;
+      const {
+        user: { id },
+      } = req;
+      const request = query.isCreatorUser ? { ...query, isCreatorUser: id } : query;
       const [tasks, users, statuses, labels] = await Promise.all([
-        app.objection.models.task.query().withGraphJoined('[creator, executor, status]'),
+        getQuery(app, request),
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
       ]);
       reply.render('tasks/index', {
-        tasks, users, statuses, labels,
+        tasks,
+        users,
+        statuses,
+        labels,
+        request,
       });
       return reply;
     })
