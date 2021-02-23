@@ -25,6 +25,7 @@ export default (app) => {
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
+
       ]);
       reply.render('tasks/new', {
         task,
