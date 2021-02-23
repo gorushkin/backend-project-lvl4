@@ -55,15 +55,14 @@ export default (app) => {
         const labelsId = getLabelIdList(labels);
 
         await app.objection.models.task.transaction(async (trx) => {
-          const { id } = await app.objection.models.task.query(trx).insert(task);
-
-          Promise.all(
-            labelsId.map((labelId) => app.objection.models.task.relatedQuery('labels').for(id).relate(labelId)),
+          const insertedTask = await app.objection.models.task.query(trx).insert(task);
+          await Promise.all(
+            labelsId.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId)),
           );
         });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
-        reply.redirect(app.reverse('root'));
+        reply.redirect(app.reverse('tasks'));
         return reply;
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.task.create.error'));
