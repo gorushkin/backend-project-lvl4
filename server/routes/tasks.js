@@ -98,14 +98,14 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const [task, users, statuses, labels, taskLabels] = await Promise.all([
-          app.objection.models.task
-            .query()
-            .findById(req.params.id),
+        const task = await app.objection.models.task
+          .query()
+          .findById(req.params.id);
+        const [users, statuses, labels, taskLabels] = await Promise.all([
           app.objection.models.user.query(),
           app.objection.models.status.query(),
           app.objection.models.label.query(),
-          (await app.objection.models.task.query().findById(req.params.id)).$relatedQuery('labels'),
+          task.$relatedQuery('labels'),
         ]);
         const taskLabelId = taskLabels.map(({ id }) => id);
         reply.render('tasks/edit', {
