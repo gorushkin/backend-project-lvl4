@@ -2,14 +2,6 @@
 
 import i18next from 'i18next';
 
-const getLabelIdList = (labels = []) => {
-  const labelIdFormatMatching = {
-    string: (id) => [parseInt(id, 10)],
-    object: (labelsId) => labelsId.map((id) => parseInt(id, 10)),
-  };
-  return labelIdFormatMatching[typeof labels](labels);
-};
-
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
@@ -36,9 +28,7 @@ export default (app) => {
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
       const {
         body: {
-          data: {
-            name, description, statusId, executorId, labels,
-          },
+          data: { name, description, statusId, executorId, labels = [] },
         },
       } = req;
 
@@ -52,12 +42,11 @@ export default (app) => {
         };
 
         const task = await app.objection.models.task.fromJson(data);
-        const labelsId = getLabelIdList(labels);
-
+        const labelIds = [labels].flat().map((id) => parseInt(id, 10));
         await app.objection.models.task.transaction(async (trx) => {
           const insertedTask = await app.objection.models.task.query(trx).insert(task);
           await Promise.all(
-            labelsId.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId)),
+            labelIds.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId))
           );
         });
 
@@ -91,7 +80,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      },
+      }
     )
     .get(
       '/tasks/:id/edit',
@@ -113,7 +102,7 @@ export default (app) => {
           taskLabelId,
         });
         return reply;
-      },
+      }
     )
     .patch(
       '/tasks/:id',
@@ -133,7 +122,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      },
+      }
     )
     .delete(
       '/tasks/:id',
@@ -143,19 +132,19 @@ export default (app) => {
       },
       async (req, reply) => {
         try {
-          const task = await app.objection.models.task.query().findById(req.params.id);
-          await app.objection.models.task.transaction(async (trx) => {
-            await Promise.all([
-              task.$query(trx).delete(),
-              task.$relatedQuery('labels', trx).unrelate(),
-            ]);
-          });
-          req.flash('info', i18next.t('flash.tasks.delete.success'));
+        const task = await app.objection.models.task.query().findById(req.params.id);
+        await app.objection.models.task.transaction(async (trx) => {
+          await task
+            .$relatedQuery('labels', trx)
+            .unrelate()
+            .then(() => task.$query(trx).delete());
+        });
+        req.flash('info', i18next.t('flash.tasks.delete.success'));
         } catch ({ data }) {
-          req.flash('error', i18next.t('flash.tasks.delete.error'));
+        req.flash('error', i18next.t('flash.tasks.delete.error'));
         }
         reply.redirect('/tasks');
         return reply;
-      },
+      }
     );
 };
