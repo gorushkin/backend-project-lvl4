@@ -151,6 +151,47 @@ describe('test statuses CRUD', () => {
     expect(anotherTask).toMatchObject(undeletedTask);
   });
 
+  it('add relations', async () => {
+    const taskData = testData.tasks.withlabelsTask;
+    const expected = testData.labels.related;
+
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('taskCreate'),
+      cookies: cookie,
+      payload: {
+        data: { ...taskData, labels: expected.id },
+      },
+    });
+
+    const { id } = await models.task.query().findOne({ name: taskData.name });
+    const [label] = (
+      await models.task.query().findById(id).withGraphJoined('labels')
+    ).labels.flat();
+
+    expect(response.statusCode).toBe(302);
+    expect(label).toMatchObject(expected);
+  });
+
+  it('remove relations', async () => {
+    const exsistingTaskData = testData.tasks.existing;
+    const relatedLabel = testData.labels.related;
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('taskDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const [deletedRelations] = (
+      await models.label.query().findById(relatedLabel.id).withGraphJoined('tasks')
+    ).tasks;
+    expect(deletedRelations).toBeUndefined();
+  });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();

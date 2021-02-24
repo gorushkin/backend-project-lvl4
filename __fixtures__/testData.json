@@ -44,6 +44,13 @@
     },
     "another": {
       "name": "task3"
+    },
+    "withlabelsTask": {
+      "name": "withlabelsTask",
+      "description": "new_task_withlabelsTask",
+      "statusId": 1,
+      "creatorId": 4,
+      "executorId": 1
     }
   },
   "labels": {
@@ -55,6 +62,10 @@
     },
     "updated": {
       "name": "updated label1"
+    },
+    "related": {
+      "name": "label3",
+      "id": 13
     }
   }
 }
