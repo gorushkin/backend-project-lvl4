@@ -112,8 +112,18 @@ export default (app) => {
           const {
             body: { data },
           } = req;
+          const labels = data.labels || [];
+          const labelIds = [labels].flat().map((id) => parseInt(id, 10));
           const task = await app.objection.models.task.query().findById(req.params.id);
-          await task.$query().patch(data);
+          await app.objection.models.task.transaction(async (trx) => {
+            await Promise.all([
+              task.$query(trx).patch(data),
+              task.$relatedQuery('labels', trx).unrelate(),
+              Promise.all(
+                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
+              ),
+            ]);
+          });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
           return reply;
@@ -132,16 +142,16 @@ export default (app) => {
       },
       async (req, reply) => {
         try {
-        const task = await app.objection.models.task.query().findById(req.params.id);
-        await app.objection.models.task.transaction(async (trx) => {
-          await task
-            .$relatedQuery('labels', trx)
-            .unrelate()
-            .then(() => task.$query(trx).delete());
-        });
-        req.flash('info', i18next.t('flash.tasks.delete.success'));
+          const task = await app.objection.models.task.query().findById(req.params.id);
+          await app.objection.models.task.transaction(async (trx) => {
+            await task
+              .$relatedQuery('labels', trx)
+              .unrelate()
+              .then(() => task.$query(trx).delete());
+          });
+          req.flash('info', i18next.t('flash.tasks.delete.success'));
         } catch ({ data }) {
-        req.flash('error', i18next.t('flash.tasks.delete.error'));
+          req.flash('error', i18next.t('flash.tasks.delete.error'));
         }
         reply.redirect('/tasks');
         return reply;
