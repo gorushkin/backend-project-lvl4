@@ -16,7 +16,10 @@ block content
         .col= `${task.creator.firstname} ${task.creator.lastname}`
       .row.p-1
         .col= t('views.tasks.executorId')
-        .col= `${task.executor.firstname} ${task.executor.lastname}`
+        if task.executor
+          .col= `${task.executor.firstname} ${task.executor.lastname}`
+        else
+          .col
       .row.p-1
         .col= t('views.tasks.statusId')
         .col= task.status.name
