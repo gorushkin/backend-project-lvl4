@@ -7,26 +7,8 @@ block content
   +formFor()(action=route('taskUpdate', {id: task.id}) method='post')
     +input(task, 'name', errors)(type="text")
     +input(task, 'description', errors)(type="text")
-    .form-group
-      label(for='data_statusId')= t('views.tasks.status')
-      select#data_statusId.form-control(name='data[statusId]')
-        option
-        each status in statuses
-          option(value=status.id, selected= status.id == task.statusId)= status.name
-    .form-group
-      label(for='data_executorId')= t('views.tasks.executor')
-      select#data_executorId.form-control(name='data[executorId]')
-        if !task.executorId
-          option
-        each user in users
-          if task.executorId
-            option(value=user.id, selected= user.id == task.executorId)= `${user.firstname} ${user.lastname}`
-          else
-            option(value=user.id)= `${user.firstname} ${user.lastname}`
-      .form-group
-        label(for='data_labels')= t('views.tasks.labels')
-        select.form-control(id='data_labels' name='data[labels]' multiple='multiple')
-          each label in labels
-            option(value=label.id, selected= checkLabel(label.id, taskLabelId))= label.name
+    +select(task, 'statusId', errors, statuses)
+    +select(task, 'executorId', errors, users)
+    +selectMultiple(task, 'labels', errors, labels, taskLabelId)
     input(name='_method' type='hidden' value='patch')
     +submit(task)(value=t('views.tasks.edit'))

@@ -134,9 +134,9 @@ module.exports = {
       tasks: {
         id: 'ID',
         creator: 'Автор',
-        executor: 'Исполнитель',
+        executorId: 'Исполнитель',
         name: 'Наименование',
-        status: 'Статус',
+        statusId: 'Статус',
         edit: 'Изменить',
         createdAt: 'Дата создания',
         labels: 'Метки:',
