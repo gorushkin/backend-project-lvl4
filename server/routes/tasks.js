@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import _ from 'lodash';
 
 export default (app) => {
   app
@@ -28,7 +29,9 @@ export default (app) => {
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
       const {
         body: {
-          data: { name, description, statusId, executorId, labels = [] },
+          data: {
+            name, description, statusId, executorId, labels = [],
+          },
         },
       } = req;
 
@@ -46,7 +49,7 @@ export default (app) => {
         await app.objection.models.task.transaction(async (trx) => {
           const insertedTask = await app.objection.models.task.query(trx).insert(task);
           await Promise.all(
-            labelIds.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId))
+            labelIds.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId)),
           );
         });
 
@@ -80,7 +83,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -94,15 +97,18 @@ export default (app) => {
           task.$relatedQuery('labels'),
         ]);
         const taskLabelId = taskLabels.map(({ id }) => id);
+        const labelsWithIsLabelSelectedInfo = labels.map((label) => ({
+          ...label,
+          selected: _.includes(taskLabelId, label.id),
+        }));
         reply.render('tasks/edit', {
           task,
           users,
           statuses,
-          labels,
-          taskLabelId,
+          labels: labelsWithIsLabelSelectedInfo,
         });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
@@ -120,7 +126,7 @@ export default (app) => {
               task.$query(trx).patch(data),
               task.$relatedQuery('labels', trx).unrelate(),
               Promise.all(
-                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
+                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId)),
               ),
             ]);
           });
@@ -132,7 +138,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -155,6 +161,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };

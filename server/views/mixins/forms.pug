@@ -32,8 +32,7 @@ mixin buttonTo(action, method)
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
 
-mixin select(task, propertyName, errors = {}, items, ids = [], multiple = false)
-  - propertyNameIds = multiple ? ids : task[propertyName]
+mixin select(task, propertyName, errors = {}, items, multiple = false)
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
   .form-group
@@ -42,7 +41,7 @@ mixin select(task, propertyName, errors = {}, items, ids = [], multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= isItemSelected(item.id, propertyNameIds))= getItemName(item)
+        option(value=item.id, selected= item.selected || item.id == task[propertyName])= getItemName(item)
 
-mixin selectMultiple(task, propertyName, errors = {}, items, ids)
-  +select(task, propertyName, errors, items, ids, true)
+mixin selectMultiple(task, propertyName, errors = {}, items)
+  +select(task, propertyName, errors, items, true)

@@ -27,7 +27,4 @@ export default (app) => ({
     const date = new Date(str);
     return date.toLocaleString();
   },
-  isItemSelected(id, ids) {
-    return _.includes([ids].flat(), id);
-  },
 });
