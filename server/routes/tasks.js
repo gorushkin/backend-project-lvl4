@@ -91,23 +91,20 @@ export default (app) => {
       '/tasks/:id/edit',
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
-        const task = await app.objection.models.task.query().findById(req.params.id);
-        const [users, statuses, labels, taskLabels] = await Promise.all([
+        const [task, users, statuses, labels] = await Promise.all([
+          app.objection.models.task
+          .query()
+          .findById(req.params.id)
+          .withGraphJoined('labels'),
           app.objection.models.user.query(),
           app.objection.models.status.query(),
           app.objection.models.label.query(),
-          task.$relatedQuery('labels'),
         ]);
-        const taskLabelId = taskLabels.map(({ id }) => id);
-        const labelsWithIsLabelSelectedInfo = labels.map((label) => ({
-          ...label,
-          selected: _.includes(taskLabelId, label.id),
-        }));
         reply.render('tasks/edit', {
           task,
           users,
           statuses,
-          labels: labelsWithIsLabelSelectedInfo,
+          labels,
         });
         return reply;
       }

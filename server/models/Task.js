@@ -66,4 +66,8 @@ export default class Task extends unique(Model) {
       },
     };
   }
+
+  getName() {
+    return this.name;
+  }
 }

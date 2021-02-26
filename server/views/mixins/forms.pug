@@ -1,6 +1,6 @@
 - const getInputName = (property) => `data[${property}]`
 - const getInputId = (property) => `data_${property}`
-- const getItemName = (item) => { const result = item.name ? item.name : `${item.firstname} ${item.lastname}`; return result; }
+- const isItemSelected = (id, ids) => id === ids || _.find(ids, { id })
 
 mixin formFor(entity = null)
   form&attributes(attributes)
@@ -41,7 +41,7 @@ mixin select(task, propertyName, errors = {}, items, multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= item.selected || item.id == task[propertyName])= getItemName(item)
+        option(value=item.id, selected= isItemSelected(item.id, task[propertyName]))= item.getName()
 
 mixin selectMultiple(task, propertyName, errors = {}, items)
   +select(task, propertyName, errors, items, true)
