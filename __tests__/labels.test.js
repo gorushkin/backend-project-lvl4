@@ -22,7 +22,7 @@ describe('test statuses CRUD', () => {
     // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
-    cookie = await getCookie(app, testData.users.existing);
+    cookie = await getCookie(app, testData.users.another);
   });
 
   it('Get labels page work', async () => {
@@ -113,6 +113,30 @@ describe('test statuses CRUD', () => {
     const deletedStatus = await models.label.query().findOne({ id });
     expect(deletedStatus).toBeUndefined();
   });
+
+  it('add relations', async () => {
+    const taskData = testData.tasks.existingWithLabels;
+    const expected = testData.labels.related;
+
+    const response = await app.inject({
+      method: 'POST',
+      url: app.reverse('taskCreate'),
+      cookies: cookie,
+      payload: {
+        data: { ...taskData, labels: expected.id },
+      },
+    });
+
+    const { id } = await models.task.query().findOne({ name: taskData.name });
+    const [label] = (
+      await models.task.query().findById(id).withGraphJoined('labels')
+    ).labels.flat();
+
+    expect(response.statusCode).toBe(302);
+    expect(label).toMatchObject(expected);
+  });
+
+
 
   afterEach(async () => {
     // после каждого теста откатываем миграции

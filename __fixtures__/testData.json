@@ -45,7 +45,7 @@
     "another": {
       "name": "task3"
     },
-    "withlabelsTask": {
+    "existingWithLabels": {
       "name": "withlabelsTask",
       "description": "new_task_withlabelsTask",
       "statusId": 1,
