@@ -27,11 +27,10 @@ export default (app) => {
       });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
+      console.log(req.body.data);
       const {
         body: {
-          data: {
-            name, description, statusId, executorId, labels = [],
-          },
+          data: { name, description, statusId, executorId, labels = [] },
         },
       } = req;
 
@@ -45,20 +44,23 @@ export default (app) => {
         };
 
         const task = await app.objection.models.task.fromJson(data);
-        const labelIds = [labels].flat().map((id) => parseInt(id, 10));
-        await app.objection.models.task.transaction(async (trx) => {
-          const insertedTask = await app.objection.models.task.query(trx).insert(task);
-          await Promise.all(
-            labelIds.map((labelId) => insertedTask.$relatedQuery('labels', trx).relate(labelId)),
-          );
+        const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+
+        await app.objection.models.task.query().insertGraph([{ ...task, labels: labelIds }], {
+          relate: ['labels'],
         });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;
       } catch ({ data }) {
-        req.flash('error', i18next.t('flash.task.create.error'));
-        reply.render('/tasks/new', { task: req.body.data, errors: data });
+        req.flash('error', i18next.t('flash.tasks.create.error'));
+        const [users, statuses, labels] = await Promise.all([
+          app.objection.models.user.query(),
+          app.objection.models.status.query(),
+          app.objection.models.label.query(),
+        ]);
+        reply.render('/tasks/new', { task: req.body.data, users, statuses, labels, errors: data });
         return reply;
       }
     })
@@ -83,7 +85,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      },
+      }
     )
     .get(
       '/tasks/:id/edit',
@@ -108,7 +110,7 @@ export default (app) => {
           labels: labelsWithIsLabelSelectedInfo,
         });
         return reply;
-      },
+      }
     )
     .patch(
       '/tasks/:id',
@@ -126,7 +128,7 @@ export default (app) => {
               task.$query(trx).patch(data),
               task.$relatedQuery('labels', trx).unrelate(),
               Promise.all(
-                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId)),
+                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
               ),
             ]);
           });
@@ -138,7 +140,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      },
+      }
     )
     .delete(
       '/tasks/:id',
@@ -161,6 +163,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      },
+      }
     );
 };
