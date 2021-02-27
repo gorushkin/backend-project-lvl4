@@ -63,17 +63,13 @@ export default (app) => {
       '/labels/:id',
       { name: 'labelsDelete', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const label = await app.objection.models.label.query().findById(req.params.id);
-          const tasks = await label.$relatedQuery('tasks');
-          if (tasks.length !== 0) {
-            req.flash('error', i18next.t('flash.labels.delete.error'));
-          } else {
-            await label.$query().delete();
-            req.flash('info', i18next.t('flash.labels.delete.success'));
-          }
-        } catch ({ data }) {
+        const label = await app.objection.models.label.query().findById(req.params.id);
+        const tasks = await label.$relatedQuery('tasks');
+        if (tasks.length !== 0) {
           req.flash('error', i18next.t('flash.labels.delete.error'));
+        } else {
+          await label.$query().delete();
+          req.flash('info', i18next.t('flash.labels.delete.success'));
         }
         reply.redirect('/labels');
         return reply;

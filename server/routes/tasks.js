@@ -1,7 +1,6 @@
 // @ts-check
 
 import i18next from 'i18next';
-import _ from 'lodash';
 
 export default (app) => {
   app
@@ -27,10 +26,11 @@ export default (app) => {
       });
     })
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
-      console.log(req.body.data);
       const {
         body: {
-          data: { name, description, statusId, executorId, labels = [] },
+          data: {
+            name, description, statusId, executorId, labels = [],
+          },
         },
       } = req;
 
@@ -55,12 +55,18 @@ export default (app) => {
         return reply;
       } catch ({ data }) {
         req.flash('error', i18next.t('flash.tasks.create.error'));
-        const [users, statuses, labels] = await Promise.all([
+        const [users, statuses, labelList] = await Promise.all([
           app.objection.models.user.query(),
           app.objection.models.status.query(),
           app.objection.models.label.query(),
         ]);
-        reply.render('/tasks/new', { task: req.body.data, users, statuses, labels, errors: data });
+        reply.render('/tasks/new', {
+          task: req.body.data,
+          users,
+          statuses,
+          labels: labelList,
+          errors: data,
+        });
         return reply;
       }
     })
@@ -85,7 +91,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -104,43 +110,45 @@ export default (app) => {
           labels,
         });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
-        // try {
+        try {
           const {
-            body: { data },
+            body: {
+              data: {
+                name, executorId, creatorId, statusId, description, labels = [],
+              },
+            },
           } = req;
-          const labels = data.labels || [];
-          const labelIds = [labels].flat().map((id) => parseInt(id, 10));
-          const task = await app.objection.models.task.query().findById(req.params.id);
-          console.log('task: ', task);
-          // await app.objection.models.task.transaction(async (trx) => {
-          //   await Promise.all([
-          //     task.$query(trx).patch(data),
-          //     task.$relatedQuery('labels', trx).unrelate(),
-          //     Promise.all(
-          //       labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
-          //     ),
-          //   ]);
-          // });
-          console.log(req.params.id);
-          await app.objection.models.task.query().upsertGraph({
-            id: req.params.id,
-            ...data,
-          });
+          const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+          await app.objection.models.task.query().upsertGraph(
+            {
+              id: parseInt(req.params.id, 10),
+              name,
+              executorId,
+              creatorId,
+              description,
+              statusId,
+              labels: labelIds,
+            },
+            {
+              relate: true,
+              unrelate: true,
+            },
+          );
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
           return reply;
-        // } catch ({ data }) {
-        //   req.flash('error', i18next.t('flash.tasks.edit.error'));
-        //   reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
-        //   return reply;
-        // }
-      }
+        } catch ({ data }) {
+          req.flash('error', i18next.t('flash.tasks.edit.error'));
+          reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
+          return reply;
+        }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -163,6 +171,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };

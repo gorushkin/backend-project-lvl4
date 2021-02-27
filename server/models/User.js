@@ -49,6 +49,6 @@ export default class User extends unique(Model) {
   }
 
   getName() {
-    return `${this.firstname} ${this.lastname}`
+    return `${this.firstname} ${this.lastname}`;
   }
 }

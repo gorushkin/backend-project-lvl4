@@ -136,8 +136,6 @@ describe('test statuses CRUD', () => {
     expect(label).toMatchObject(expected);
   });
 
-
-
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();
