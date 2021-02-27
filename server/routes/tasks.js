@@ -92,10 +92,7 @@ export default (app) => {
       { name: 'taskEdit', preValidation: app.authenticate },
       async (req, reply) => {
         const [task, users, statuses, labels] = await Promise.all([
-          app.objection.models.task
-          .query()
-          .findById(req.params.id)
-          .withGraphJoined('labels'),
+          app.objection.models.task.query().findById(req.params.id).withGraphJoined('labels'),
           app.objection.models.user.query(),
           app.objection.models.status.query(),
           app.objection.models.label.query(),
@@ -113,30 +110,36 @@ export default (app) => {
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
+        // try {
           const {
             body: { data },
           } = req;
           const labels = data.labels || [];
           const labelIds = [labels].flat().map((id) => parseInt(id, 10));
           const task = await app.objection.models.task.query().findById(req.params.id);
-          await app.objection.models.task.transaction(async (trx) => {
-            await Promise.all([
-              task.$query(trx).patch(data),
-              task.$relatedQuery('labels', trx).unrelate(),
-              Promise.all(
-                labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
-              ),
-            ]);
+          console.log('task: ', task);
+          // await app.objection.models.task.transaction(async (trx) => {
+          //   await Promise.all([
+          //     task.$query(trx).patch(data),
+          //     task.$relatedQuery('labels', trx).unrelate(),
+          //     Promise.all(
+          //       labelIds.map((labelId) => task.$relatedQuery('labels', trx).relate(labelId))
+          //     ),
+          //   ]);
+          // });
+          console.log(req.params.id);
+          await app.objection.models.task.query().upsertGraph({
+            id: req.params.id,
+            ...data,
           });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.tasks.edit.error'));
-          reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
-          return reply;
-        }
+        // } catch ({ data }) {
+        //   req.flash('error', i18next.t('flash.tasks.edit.error'));
+        //   reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
+        //   return reply;
+        // }
       }
     )
     .delete(
