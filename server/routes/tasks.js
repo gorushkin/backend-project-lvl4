@@ -46,8 +46,10 @@ export default (app) => {
         const task = await app.objection.models.task.fromJson(data);
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-        await app.objection.models.task.query().insertGraph([{ ...task, labels: labelIds }], {
-          relate: ['labels'],
+        await app.objection.models.task.transaction(async (trx) => {
+          await app.objection.models.task.query(trx).insertGraph([{ ...task, labels: labelIds }], {
+            relate: ['labels'],
+          });
         });
 
         req.flash('info', i18next.t('flash.tasks.create.success'));
