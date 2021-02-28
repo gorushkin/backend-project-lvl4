@@ -37,10 +37,45 @@
       "executorId": 1
     },
     "existing": {
-      "name": "task1"
+      "name": "task1",
+      "creatorId": 4
     },
-    "updated": {
-      "name": "updated task1"
+    "fullyUpdated": {
+      "name": "updated task1",
+      "description": "new_task1_description",
+      "statusId": 1,
+      "creatorId": 4,
+      "executorId": 2
+    },
+    "withNameOnlyUpdated": {
+      "name": "updated task1",
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 4,
+      "executorId": 1
+    },
+    "withStatusOnlyUpdated": {
+      "name": "task1",
+      "description": "task1_description",
+      "statusId": 1,
+      "creatorId": 4,
+      "executorId": 1
+    },
+    "withExecutorOnlyUpdated": {
+      "id": 1,
+      "name": "task1",
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 4,
+      "executorId": 2
+    },
+    "withCreatorOnlyUpdated": {
+      "id": 1,
+      "name": "task1",
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 2,
+      "executorId": 1
     },
     "another": {
       "name": "task3"

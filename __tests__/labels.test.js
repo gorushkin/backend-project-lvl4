@@ -135,6 +135,26 @@ describe('test statuses CRUD', () => {
     expect(label).toMatchObject(expected);
   });
 
+  it('remove relations', async () => {
+    const exsistingTaskData = testData.tasks.existing;
+    const relatedLabel = testData.labels.related;
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: app.reverse('taskDelete', { id }),
+      cookies: cookie,
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const [deletedRelations] = (
+      await models.label.query().findById(relatedLabel.id).withGraphJoined('tasks')
+    ).tasks;
+
+    expect(deletedRelations).toBeUndefined();
+  });
+
   afterEach(async () => {
     // после каждого теста откатываем миграции
     await knex.migrate.rollback();

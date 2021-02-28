@@ -98,9 +98,9 @@ describe('test statuses CRUD', () => {
     expect(newTask).toMatchObject(expected);
   });
 
-  it('Edit existing status', async () => {
+  it('Update existing task with all fields', async () => {
     const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.updated;
+    const updatedTaskData = testData.tasks.fullyUpdated;
 
     const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
 
@@ -110,6 +110,69 @@ describe('test statuses CRUD', () => {
       cookies: cookie,
       payload: {
         data: updatedTaskData,
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedTask = await models.task.query().findById(id);
+    expect(updatedTask).toMatchObject(updatedTaskData);
+  });
+
+  it('Update existing task with name only', async () => {
+    const exsistingTaskData = testData.tasks.existing;
+    const updatedTaskData = testData.tasks.withNameOnlyUpdated;
+
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('taskUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: { name: updatedTaskData.name },
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedTask = await models.task.query().findById(id);
+    expect(updatedTask).toMatchObject(updatedTaskData);
+  });
+
+  it('Update existing task with status only', async () => {
+    const exsistingTaskData = testData.tasks.existing;
+    const updatedTaskData = testData.tasks.withStatusOnlyUpdated;
+
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('taskUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: { statusId: updatedTaskData.statusId },
+      },
+    });
+
+    expect(response.statusCode).toBe(302);
+
+    const updatedTask = await models.task.query().findById(id);
+    expect(updatedTask).toMatchObject(updatedTaskData);
+  });
+
+  it('Update existing task with executor only', async () => {
+    const exsistingTaskData = testData.tasks.existing;
+    const updatedTaskData = testData.tasks.withExecutorOnlyUpdated;
+
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('taskUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: { executorId: updatedTaskData.executorId },
       },
     });
 
@@ -151,24 +214,24 @@ describe('test statuses CRUD', () => {
     expect(anotherTask).toMatchObject(undeletedTask);
   });
 
-  it('remove relations', async () => {
+  it('is not possible to update creatorId', async () => {
     const exsistingTaskData = testData.tasks.existing;
-    const relatedLabel = testData.labels.related;
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+    const updatedTaskData = testData.tasks.withCreatorOnlyUpdated;
 
+    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
     const response = await app.inject({
-      method: 'DELETE',
-      url: app.reverse('taskDelete', { id }),
+      method: 'PATCH',
+      url: app.reverse('taskUpdate', { id }),
       cookies: cookie,
+      payload: {
+        data: { creatorId: updatedTaskData.creatorId },
+      },
     });
 
     expect(response.statusCode).toBe(302);
 
-    const [deletedRelations] = (
-      await models.label.query().findById(relatedLabel.id).withGraphJoined('tasks')
-    ).tasks;
-
-    expect(deletedRelations).toBeUndefined();
+    const updatedTask = await models.task.query().findById(id);
+    expect(updatedTask).toMatchObject(exsistingTaskData);
   });
 
   afterEach(async () => {

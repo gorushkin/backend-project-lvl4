@@ -122,7 +122,7 @@ export default (app) => {
           const {
             body: {
               data: {
-                name, executorId, creatorId, statusId, description, labels = [],
+                name, executorId, statusId, description, labels = [],
               },
             },
           } = req;
@@ -132,7 +132,6 @@ export default (app) => {
               id: parseInt(req.params.id, 10),
               name,
               executorId,
-              creatorId,
               description,
               statusId,
               labels: labelIds,
