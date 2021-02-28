@@ -127,9 +127,8 @@ describe('test statuses CRUD', () => {
       },
     });
 
-    const { id } = await models.task.query().findOne({ name: taskData.name });
     const [label] = (
-      await models.task.query().findById(id).withGraphJoined('labels')
+      await models.task.query().findOne({ 'tasks.name': taskData.name }).withGraphJoined('labels')
     ).labels.flat();
 
     expect(response.statusCode).toBe(302);
