@@ -41,7 +41,7 @@ mixin select(task, propertyName, errors = {}, items, multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= isItemSelected(item.id, task[propertyName]))= item.getName()
+        option(value=item.id, selected= isItemSelected(item.id, task[propertyName]))= item.name
 
 mixin selectMultiple(task, propertyName, errors = {}, items)
   +select(task, propertyName, errors, items, true)

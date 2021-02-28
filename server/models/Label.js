@@ -38,8 +38,4 @@ export default class Label extends unique(Model) {
       },
     };
   }
-
-  getName() {
-    return this.name;
-  }
 }

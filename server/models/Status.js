@@ -34,8 +34,4 @@ export default class Status extends unique(Model) {
       },
     };
   }
-
-  getName() {
-    return this.name;
-  }
 }
