@@ -1,11 +1,9 @@
 // @ts-check
+
 import path from 'path';
 import { Model } from 'objection';
-import objectionUnique from 'objection-unique';
 
-const unique = objectionUnique({ fields: ['id'] });
-
-export default class Task extends unique(Model) {
+export default class Task extends Model {
   static get tableName() {
     return 'tasks';
   }
