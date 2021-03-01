@@ -127,20 +127,22 @@ export default (app) => {
             },
           } = req;
           const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
-          await app.objection.models.task.query().upsertGraph(
-            {
-              id: parseInt(req.params.id, 10),
-              name,
-              executorId,
-              description,
-              statusId,
-              labels: labelIds,
-            },
-            {
-              relate: true,
-              unrelate: true,
-            },
-          );
+          await app.objection.models.task.transaction(async (trx) => {
+            await app.objection.models.task.query(trx).upsertGraph(
+              {
+                id: parseInt(req.params.id, 10),
+                name,
+                executorId,
+                description,
+                statusId,
+                labels: labelIds,
+              },
+              {
+                relate: true,
+                unrelate: true,
+              },
+            );
+          });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
           return reply;
