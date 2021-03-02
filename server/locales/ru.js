@@ -57,6 +57,22 @@ module.exports = {
         authError: 'Задачу может удалить только ее автор',
         detailsError: 'Нет задачи с такими параметрами',
       },
+      labels: {
+        create: {
+          error: 'Не удалось создать метку',
+          success: 'Метка успешно создана',
+        },
+        edit: {
+          error: 'Не удалось изменить метку',
+          success: 'Метка успешно создан изменена',
+        },
+        delete: {
+          error: 'Не удалось удалить метку',
+          success: 'Метка успешно удалёна',
+        },
+        authError: 'Задачу может удалить только ее автор',
+        detailsError: 'Нет метки с такими параметрами',
+      },
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
     },
     layouts: {
@@ -64,6 +80,7 @@ module.exports = {
         users: 'Пользователи',
         statuses: 'Статусы',
         tasks: 'Задачи',
+        labels: 'Метки',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -117,9 +134,9 @@ module.exports = {
       tasks: {
         id: 'ID',
         creator: 'Автор',
-        executor: 'Исполнитель',
+        executorId: 'Исполнитель',
         name: 'Наименование',
-        status: 'Статус',
+        statusId: 'Статус',
         edit: 'Изменить',
         createdAt: 'Дата создания',
         labels: 'Метки:',
@@ -133,7 +150,20 @@ module.exports = {
         editTitle: 'Изменение задачи',
         actions: '',
       },
-
+      labels: {
+        id: 'ID',
+        name: 'Наименование',
+        edit: 'Изменить',
+        createdAt: 'Дата создания',
+        new: {
+          submit: 'Создать',
+        },
+        delete: 'Удалить',
+        createTitle: 'Создание метки',
+        editTitle: 'Изменение метки',
+        actions: '',
+        create: 'Создать метку',
+      },
       welcome: {
         index: {
           hello: 'Привет от Хекслета!',

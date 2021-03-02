@@ -7,9 +7,9 @@ block content
       tr
         th= t('views.tasks.id')
         th= t('views.tasks.name')
-        th= t('views.tasks.status')
+        th= t('views.tasks.statusId')
         th= t('views.tasks.creator')
-        th= t('views.tasks.executor')
+        th= t('views.tasks.executorId')
         th= t('views.tasks.createdAt')
         th= t('views.tasks.actions')
     tbody
@@ -19,8 +19,11 @@ block content
           td
             a(href=route('taskDetails', {id: task.id}))= task.name
           td= task.status.name
-          td= `${task.creator.firstname} ${task.creator.lasttname}`
-          td= `${task.executor.firstname} ${task.executor.lasttname}`
+          td= `${task.creator.firstname} ${task.creator.lastname}`
+          if task.executor
+            td= `${task.executor.firstname} ${task.executor.lastname}`
+          else
+            td
           td= formatDate(task.createdAt)
           td
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')

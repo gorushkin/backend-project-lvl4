@@ -1,0 +1,9 @@
+extends ../layouts/application.pug
+
+block header
+  = t('views.labels.createTitle')
+
+block content
+  +formFor()(action=route('labelCreate') method='post')
+    +input(lable, 'name', errors)(type="text")
+    +submit(lable)(value=t('views.labels.new.submit'))

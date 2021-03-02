@@ -1,5 +1,6 @@
 - const getInputName = (property) => `data[${property}]`
 - const getInputId = (property) => `data_${property}`
+- const isItemSelected = (id, ids) => id === ids || _.find(ids, { id })
 
 mixin formFor(entity = null)
   form&attributes(attributes)
@@ -30,3 +31,17 @@ mixin buttonTo(action, method)
   form(action=action, method="post")
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
+
+mixin select(task, propertyName, errors = {}, items, multiple = false)
+  - inputId = getInputId(propertyName)
+  - name = getInputName(propertyName)
+  .form-group
+    label(for=inputId)= t(`views.tasks.${propertyName}`)
+    select.form-control(id= inputId, name=name, multiple=multiple)
+      if !multiple
+        option
+      each item in items
+        option(value=item.id, selected= isItemSelected(item.id, task[propertyName]))= item.name
+
+mixin selectMultiple(task, propertyName, errors = {}, items)
+  +select(task, propertyName, errors, items, true)

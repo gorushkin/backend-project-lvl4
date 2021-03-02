@@ -1,11 +1,9 @@
 // @ts-check
+
 import path from 'path';
 import { Model } from 'objection';
-import objectionUnique from 'objection-unique';
 
-const unique = objectionUnique({ fields: ['id'] });
-
-export default class Task extends unique(Model) {
+export default class Task extends Model {
   static get tableName() {
     return 'tasks';
   }
@@ -50,6 +48,18 @@ export default class Task extends unique(Model) {
         join: {
           from: 'tasks.status_id',
           to: 'statuses.id',
+        },
+      },
+      labels: {
+        relation: Model.ManyToManyRelation,
+        modelClass: path.join(__dirname, 'Label'),
+        join: {
+          from: 'tasks.id',
+          through: {
+            from: 'tasks_labels.task_id',
+            to: 'tasks_labels.label_id',
+          },
+          to: 'labels.id',
         },
       },
     };

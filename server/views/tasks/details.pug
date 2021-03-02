@@ -15,10 +15,13 @@ block content
         .col= t('views.tasks.creator')
         .col= `${task.creator.firstname} ${task.creator.lastname}`
       .row.p-1
-        .col= t('views.tasks.executor')
-        .col= `${task.executor.firstname} ${task.executor.lastname}`
+        .col= t('views.tasks.executorId')
+        if task.executor
+          .col= `${task.executor.firstname} ${task.executor.lastname}`
+        else
+          .col
       .row.p-1
-        .col= t('views.tasks.status')
+        .col= t('views.tasks.statusId')
         .col= task.status.name
       .row.p-1
         .col= t('views.tasks.createdAt')
@@ -27,7 +30,8 @@ block content
         .col
           h6= t('views.tasks.labels')
           ul
-            li
+            each label in task.labels
+              li= label.name
       .row.p-1
         .col
           a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')

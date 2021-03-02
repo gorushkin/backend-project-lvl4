@@ -47,4 +47,8 @@ export default class User extends unique(Model) {
   verifyPassword(password) {
     return encrypt(password) === this.passwordDigest;
   }
+
+  get name() {
+    return `${this.firstname} ${this.lastname}`;
+  }
 }
