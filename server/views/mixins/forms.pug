@@ -45,3 +45,12 @@ mixin select(task, propertyName, errors = {}, items, multiple = false)
 
 mixin selectMultiple(task, propertyName, errors = {}, items)
   +select(task, propertyName, errors, items, true)
+
+mixin filterSelect(propertyName, items)
+  - inputId = getInputId(propertyName)
+  .form-group
+    label(for=inputId)= t(`views.tasks.${propertyName}`)
+    select.form-control.ml-2.mr-3(id= inputId, name=propertyName)
+      option
+      each item in items
+        option(value=item.id, selected= item.id == request[propertyName])= item.name

@@ -2,6 +2,16 @@ extends ../layouts/application.pug
 
 block content
   a.nav-link(href='/tasks/new')= t('views.tasks.create')
+  .jumbotron.p-2
+    form.form-inline(action='/tasks' method='get')
+      +filterSelect('status', statuses)
+      +filterSelect('executor', users)
+      +filterSelect('label', labels)
+      .form-group.form-check
+        input#data_isCreatorUser.form-check-input(type='checkbox', name='isCreatorUser', checked=(!!request.isCreatorUser))
+        label.form-check-label(for='data_isCreatorUser')= t('views.tasks.isCreatorUser')
+      .form-group
+        input.btn.btn-primary.ml-3(type='submit' value=t('views.tasks.filter'))
   table.table.table-striped
     thead
       tr

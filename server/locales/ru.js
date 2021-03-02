@@ -149,6 +149,11 @@ module.exports = {
         createTitle: 'Создание задачи',
         editTitle: 'Изменение задачи',
         actions: '',
+        status: 'Статус',
+        executor: 'Исполнитель',
+        filter: 'Показать',
+        isCreatorUser: 'Только мои задачи',
+        label: 'Метка',
       },
       labels: {
         id: 'ID',
