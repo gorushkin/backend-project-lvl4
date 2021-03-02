@@ -25,61 +25,6 @@ describe('test statuses CRUD', () => {
     cookie = await getCookie(app, testData.users.another);
   });
 
-  it('Get status code 200 on /tasks', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasks'),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('Get status code 200 on /tasks/new', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('newTask'),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('Get status code 200 on /tasks/:id/edit', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('taskEdit', { id }),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('Get status code 200 on /tasks/:id', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('taskDetails', { id }),
-      cookies: cookie,
-    });
-
-    expect(response.statusCode).toBe(200);
-  });
-
-  it('Get status code 302 with unauthorized request', async () => {
-    const response = await app.inject({
-      method: 'GET',
-      url: app.reverse('tasks'),
-    });
-
-    expect(response.statusCode).toBe(302);
-  });
-
   it('Create new task', async () => {
     const expected = testData.tasks.new;
 
@@ -96,90 +41,6 @@ describe('test statuses CRUD', () => {
 
     const newTask = await models.task.query().findOne({ name: expected.name });
     expect(newTask).toMatchObject(expected);
-  });
-
-  it('Update existing task with all fields', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.fullyUpdated;
-
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('taskUpdate', { id }),
-      cookies: cookie,
-      payload: {
-        data: updatedTaskData,
-      },
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(updatedTaskData);
-  });
-
-  it('Update existing task with name only', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.withNameOnlyUpdated;
-
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('taskUpdate', { id }),
-      cookies: cookie,
-      payload: {
-        data: { name: updatedTaskData.name },
-      },
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(updatedTaskData);
-  });
-
-  it('Update existing task with status only', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.withStatusOnlyUpdated;
-
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('taskUpdate', { id }),
-      cookies: cookie,
-      payload: {
-        data: { statusId: updatedTaskData.statusId },
-      },
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(updatedTaskData);
-  });
-
-  it('Update existing task with executor only', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.withExecutorOnlyUpdated;
-
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('taskUpdate', { id }),
-      cookies: cookie,
-      payload: {
-        data: { executorId: updatedTaskData.executorId },
-      },
-    });
-
-    expect(response.statusCode).toBe(302);
-
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(updatedTaskData);
   });
 
   it('Delete existing task', async () => {
@@ -214,24 +75,134 @@ describe('test statuses CRUD', () => {
     expect(anotherTask).toMatchObject(undeletedTask);
   });
 
-  it('is not possible to update creatorId', async () => {
-    const exsistingTaskData = testData.tasks.existing;
-    const updatedTaskData = testData.tasks.withCreatorOnlyUpdated;
+  const templatesTestsData = [
+    {
+      testName: 'Get status code 200 on /tasks',
+      testUrl: (server) => server.reverse('tasks'),
+      isAuthenticated: true,
+      statusCode: 200,
+    },
+    {
+      testName: 'Get status code 200 on /tasks/new',
+      testUrl: (server) => server.reverse('newTask'),
+      isAuthenticated: true,
+      statusCode: 200,
+    },
+    {
+      testName: 'Get status code 200 on /tasks/:id/edit',
+      testUrl: (server, id) => server.reverse('taskEdit', { id }),
+      isAuthenticated: true,
+      statusCode: 200,
+    },
+    {
+      testName: 'Get status code 200 on /tasks/:id',
+      testUrl: (server, id) => server.reverse('taskDetails', { id }),
+      isAuthenticated: true,
+      statusCode: 200,
+    },
+    {
+      testName: 'Get status code 302 with unauthorized request',
+      testUrl: (server) => server.reverse('tasks'),
+      isAuthenticated: false,
+      statusCode: 302,
+    },
+  ];
 
-    const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
-    const response = await app.inject({
-      method: 'PATCH',
-      url: app.reverse('taskUpdate', { id }),
-      cookies: cookie,
-      payload: {
-        data: { creatorId: updatedTaskData.creatorId },
-      },
+  describe('templates test', () => {
+    test.each(
+      templatesTestsData.map(({
+        testName, testUrl, isAuthenticated, statusCode,
+      }) => [
+        testName,
+        testUrl,
+        isAuthenticated,
+        statusCode,
+      ]),
+    )('%s,', async (_, testUrl, isAuthenticated, statusCode) => {
+      const exsistingTaskData = testData.tasks.existing;
+      const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
+
+      const response = await app.inject({
+        method: 'GET',
+        url: testUrl(app, id),
+        cookies: isAuthenticated ? cookie : { session: '' },
+      });
+
+      expect(response.statusCode).toBe(statusCode);
     });
+  });
 
-    expect(response.statusCode).toBe(302);
+  const patchTaskTestsData = [
+    {
+      testName: 'Update existing task with name only',
+      testData: testData.tasks.existing,
+      updatedTestData: testData.tasks.withNameOnlyUpdated,
+      payloadData: (data) => ({ name: data.name }),
+      expectedData: testData.tasks.withNameOnlyUpdated,
+    },
+    {
+      testName: 'Update existing task with executor only',
+      testData: testData.tasks.existing,
+      updatedTestData: testData.tasks.withExecutorOnlyUpdated,
+      payloadData: (data) => ({ executorId: data.executorId }),
+      expectedData: testData.tasks.withExecutorOnlyUpdated,
 
-    const updatedTask = await models.task.query().findById(id);
-    expect(updatedTask).toMatchObject(exsistingTaskData);
+    },
+    {
+      testName: 'Update existing task with status only',
+      testData: testData.tasks.existing,
+      updatedTestData: testData.tasks.withStatusOnlyUpdated,
+      payloadData: (data) => ({ statusId: data.statusId }),
+      expectedData: testData.tasks.withStatusOnlyUpdated,
+
+    },
+    {
+      testName: 'Update existing task with all fields',
+      testData: testData.tasks.existing,
+      updatedTestData: testData.tasks.fullyUpdated,
+      payloadData: (data) => data,
+      expectedData: testData.tasks.fullyUpdated,
+
+    },
+    {
+      testName: 'is not possible to update creatorId',
+      testData: testData.tasks.existing,
+      updatedTestData: testData.tasks.withCreatorOnlyUpdated,
+      payloadData: (data) => ({ creatorId: data.creatorId }),
+      expectedData: testData.tasks.existing,
+
+    },
+  ];
+
+  describe('patch tests', () => {
+    test.each(
+      patchTaskTestsData.map(
+        ({
+          testName, testData: initialData, updatedTestData, payloadData, expectedData,
+        }) => [
+          testName,
+          initialData,
+          updatedTestData,
+          payloadData,
+          expectedData,
+        ],
+      ),
+    )('%s', async (_, initialData, updatedTestData, payloadData, expectedData) => {
+      const { id } = await models.task.query().findOne({ name: initialData.name });
+      const response = await app.inject({
+        method: 'PATCH',
+        url: app.reverse('taskUpdate', { id }),
+        cookies: cookie,
+        payload: {
+          data: payloadData(updatedTestData),
+        },
+      });
+
+      expect(response.statusCode).toBe(302);
+
+      const updatedTask = await models.task.query().findById(id);
+      expect(updatedTask).toMatchObject(expectedData);
+    });
   });
 
   afterEach(async () => {
