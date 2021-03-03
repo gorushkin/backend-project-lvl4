@@ -64,4 +64,14 @@ export default class Task extends Model {
       },
     };
   }
+
+  static async filter(query) {
+    const defaultRequest = this.query().withGraphJoined('[creator, executor, status, labels]');
+    return query.reduce((func, [key, value]) => {
+      if (!value) {
+        return func;
+      }
+      return func.where(key, value);
+    }, defaultRequest);
+  }
 }

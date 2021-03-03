@@ -2,23 +2,36 @@
 
 import i18next from 'i18next';
 
+const getNormalQuery = (query, id) => {
+  const queryMatching = {
+    executor: 'executor.id',
+    isCreatorUser: 'creator.id',
+    status: 'status.id',
+    label: 'labels.id',
+  };
+
+  const queryWithCreatorData = query.isCreatorUser ? { ...query, isCreatorUser: id } : query;
+  return Object.entries(queryWithCreatorData).map(([key, value]) => [queryMatching[key], value]);
+};
+
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      const { query } = req;
       const {
+        query,
         user: { id },
       } = req;
       const request = query.isCreatorUser ? { ...query, isCreatorUser: id } : query;
-      const tasks = await app.objection.models.task
-        .query()
-        .withGraphJoined('[creator, executor, status]');
-      const [users, statuses, labels] = await Promise.all([
+      const updatedQuery = getNormalQuery(query, id);
+      const [tasks, users, statuses, labels] = await Promise.all([
+        app.objection.models.task.filter(updatedQuery),
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
       ]);
-      reply.render('tasks/index', { tasks, users, statuses, labels, request });
+      reply.render('tasks/index', {
+        tasks, users, statuses, labels, request,
+      });
       return reply;
     })
     .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
@@ -38,7 +51,9 @@ export default (app) => {
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
       const {
         body: {
-          data: { name, description, statusId, executorId, labels = [] },
+          data: {
+            name, description, statusId, executorId, labels = [],
+          },
         },
       } = req;
 
@@ -101,7 +116,7 @@ export default (app) => {
           reply.redirect(app.reverse('tasks'));
           return reply;
         }
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -120,7 +135,7 @@ export default (app) => {
           labels,
         });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
@@ -129,7 +144,9 @@ export default (app) => {
         try {
           const {
             body: {
-              data: { name, executorId, statusId, description, labels = [] },
+              data: {
+                name, executorId, statusId, description, labels = [],
+              },
             },
           } = req;
           const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
@@ -146,7 +163,7 @@ export default (app) => {
               {
                 relate: true,
                 unrelate: true,
-              }
+              },
             );
           });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
@@ -157,7 +174,7 @@ export default (app) => {
           reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
           return reply;
         }
-      }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -180,6 +197,6 @@ export default (app) => {
         }
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };
