@@ -1,8 +1,8 @@
 // @ts-check
 
+import _ from 'lodash';
 import getApp from '../server/index.js';
 import { getFixtureData, prepareData } from './helpers/index.js';
-import _ from 'lodash';
 
 describe('test filter requests', () => {
   let app;
@@ -44,18 +44,18 @@ describe('test filter requests', () => {
   test.each(testData.map(({ testName, relations }) => [testName, relations]))(
     '%s',
     async (testName, relations) => {
-      const filteredData = relations.map((relation) =>
-        fixtureData.filter((task) => task[`${relation.name}Id`] === relation.id).map(({ id }) => id)
-      );
+      const filteredData = relations
+        .map((relation) => fixtureData
+          .filter((task) => task[`${relation.name}Id`] === relation.id));
 
       const expected = _.intersection(...filteredData);
 
       const request = relations.map(({ name, id }) => [`${name}.id`, id]);
-      const result = (await models.task.filter(request)).map(({ id }) => id);
+      const result = (await models.task.filter(request));
 
       expect(result).toMatchObject(expected);
       // expect(1).toEqual(1);
-    }
+    },
   );
 
   afterAll(() => {
