@@ -3,17 +3,17 @@
     "id": 1,
     "name": "task1",
     "description": "task1_description",
-    "statusId": "2",
-    "creatorId": "4",
-    "executorId": "1"
+    "statusId": 2,
+    "creatorId": 4,
+    "executorId": 1
   },
   {
     "id": 2,
     "name": "task2",
     "description": "task2_description",
-    "statusId": "2",
-    "creatorId": "1",
-    "executorId": "1"
+    "statusId": 2,
+    "creatorId": 1,
+    "executorId": 1
   },
   {
     "id": 3,
@@ -28,6 +28,14 @@
     "name": "task4",
     "description": "task3_with_labels",
     "statusId": 2,
+    "creatorId": 1,
+    "executorId": 1
+  },
+  {
+    "id": 5,
+    "name": "task5",
+    "description": "task55555555",
+    "statusId": 3,
     "creatorId": 1,
     "executorId": 1
   }
