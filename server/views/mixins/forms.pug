@@ -54,3 +54,11 @@ mixin filterSelect(propertyName, items)
       option
       each item in items
         option(value=item.id, selected= item.id == request[propertyName])= item.name
+
+
+mixin checkbox(propertyName)
+  - inputId = getInputId(propertyName)
+  - name = getInputName(propertyName)
+  .form-group.form-check
+    input.form-check-input(id= inputId type='checkbox', name=propertyName, checked=(!!request[propertyName]))
+    label.form-check-label(for=inputId)= t(`views.tasks.${propertyName}`)
