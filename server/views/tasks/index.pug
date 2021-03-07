@@ -3,7 +3,7 @@ extends ../layouts/application.pug
 block content
   a.nav-link(href='/tasks/new')= t('views.tasks.create')
   .jumbotron.p-2
-    +formFor(class="form-inline")(action=route('tasks') method='get')
+    +formFor()(action=route('tasks') method='get' class="form-inline")
       +filterSelect('status', statuses)
       +filterSelect('executor', users)
       +filterSelect('label', labels)
