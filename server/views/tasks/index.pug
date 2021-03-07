@@ -29,14 +29,18 @@ block content
           td
             a(href=route('taskDetails', {id: task.id}))= task.name
           td= task.status.name
-          td= `${task.creator.firstname} ${task.creator.lastname}`
+          td= `${task.creator.name}`
+          //- td= `${task.creator.firstname} ${task.creator.lastname}`
           if task.executor
-            td= `${task.executor.firstname} ${task.executor.lastname}`
+            //- td= `${task.executor.firstname} ${task.executor.lastname}`
+            td= `${task.executor.name}`
           else
             td
           td= formatDate(task.createdAt)
           td
             a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
-            form(action=route('taskDelete', {id: task.id}) method='post')
-              input(name='_method' type='hidden' value='delete')
-              input.btn.btn-link(type='submit' value=t('views.tasks.delete'))
+            //- form(action=route('taskDelete', {id: task.id}) method='post')
+            //-   input(name='_method' type='hidden' value='delete')
+            //-   input.btn.btn-link(type='submit' value=t('views.tasks.delete'))
+              //-buttonTo
+            +buttonTo()

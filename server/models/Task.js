@@ -65,13 +65,21 @@ export default class Task extends Model {
     };
   }
 
-  static async filter(query) {
-    const defaultRequest = this.query().withGraphJoined('[creator, executor, status, labels]');
-    return query.reduce((func, [key, value]) => {
-      if (!value) {
-        return func;
-      }
-      return func.where(key, value);
-    }, defaultRequest);
-  }
+  static modifiers = {
+    filterCreator(query, creator) {
+      query.where('creator.id', creator);
+    },
+
+    filterExecutor(query, id) {
+      query.where('executor.id', id);
+    },
+
+    filterStatus(query, id) {
+      query.where('status.id', id);
+    },
+
+    filterLabel(query, id) {
+      query.where('labels.id', id);
+    },
+  };
 }
