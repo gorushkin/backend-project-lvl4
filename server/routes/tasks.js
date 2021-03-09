@@ -5,26 +5,26 @@ import i18next from 'i18next';
 const getQuery = (app, {
   executor, status, label, isCreatorUser,
 }) => {
-  const defaultQuery = app.objection.models.task
+  const query = app.objection.models.task
     .query()
     .withGraphJoined('[creator, executor, status, labels]');
 
   if (executor) {
-    defaultQuery.modify('filterExecutor', executor);
+    query.modify('filterExecutor', executor);
   }
 
   if (status) {
-    defaultQuery.modify('filterStatus', status);
+    query.modify('filterStatus', status);
   }
 
   if (label) {
-    defaultQuery.modify('filterLabel', label);
+    query.modify('filterLabel', label);
   }
 
   if (isCreatorUser) {
-    defaultQuery.modify('filterCreator', isCreatorUser);
+    query.modify('filterCreator', isCreatorUser);
   }
-  return defaultQuery;
+  return query;
 };
 
 export default (app) => {
@@ -36,10 +36,8 @@ export default (app) => {
       } = req;
       const request = query.isCreatorUser ? { ...query, isCreatorUser: id } : query;
 
-      const updatedTasksQuery = getQuery(app, request);
-
       const [tasks, users, statuses, labels] = await Promise.all([
-        updatedTasksQuery,
+        getQuery(app, request),
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
