@@ -2,42 +2,35 @@
 
 import i18next from 'i18next';
 
-const getQuery = (app, {
-  executor, status, label, isCreatorUser,
-}) => {
-  const query = app.objection.models.task
-    .query()
-    .withGraphJoined('[creator, executor, status, labels]');
-
-  if (executor) {
-    query.modify('filterExecutor', executor);
-  }
-
-  if (status) {
-    query.modify('filterStatus', status);
-  }
-
-  if (label) {
-    query.modify('filterLabel', label);
-  }
-
-  if (isCreatorUser) {
-    query.modify('filterCreator', isCreatorUser);
-  }
-  return query;
-};
-
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const {
-        query,
-        user: { id },
+        query, user: { id },
       } = req;
-      const request = query.isCreatorUser ? { ...query, isCreatorUser: id } : query;
+
+      const tasksQuery = app.objection.models.task
+        .query()
+        .withGraphJoined('[creator, executor, status, labels]');
+
+      if (query.executor) {
+        tasksQuery.modify('filterExecutor', query.executor);
+      }
+
+      if (query.status) {
+        tasksQuery.modify('filterStatus', query.status);
+      }
+
+      if (query.label) {
+        tasksQuery.modify('filterLabel', query.label);
+      }
+
+      if (query.isCreatorUser) {
+        tasksQuery.modify('filterCreator', { isCreatorUser: id });
+      }
 
       const [tasks, users, statuses, labels] = await Promise.all([
-        getQuery(app, request),
+        tasksQuery,
         app.objection.models.user.query(),
         app.objection.models.status.query(),
         app.objection.models.label.query(),
@@ -47,7 +40,7 @@ export default (app) => {
         users,
         statuses,
         labels,
-        request,
+        query,
       });
       return reply;
     })
