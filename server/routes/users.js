@@ -23,7 +23,7 @@ export default (app) => {
         const user = await app.objection.models.user.query().findById(req.params.id);
         reply.render('users/edit', { user });
         return reply;
-      }
+      },
     )
     .post('/users', { name: 'userCreate' }, async (req, reply) => {
       try {
@@ -66,7 +66,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .delete(
       '/users/:id',
@@ -89,6 +89,6 @@ export default (app) => {
         }
         reply.redirect('/users');
         return reply;
-      }
+      },
     );
 };

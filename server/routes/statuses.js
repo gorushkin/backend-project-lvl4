@@ -31,7 +31,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .get(
       '/statuses/:id/edit',
@@ -40,7 +40,7 @@ export default (app) => {
         const status = await app.objection.models.status.query().findById(req.params.id);
         reply.render('statuses/edit', { status });
         return reply;
-      }
+      },
     )
     .patch(
       '/statuses/:id',
@@ -63,7 +63,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .delete(
       '/statuses/:id',
@@ -82,6 +82,6 @@ export default (app) => {
         }
         reply.redirect('/statuses');
         return reply;
-      }
+      },
     );
 };

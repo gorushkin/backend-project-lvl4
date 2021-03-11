@@ -18,9 +18,9 @@ import fastifyAuth from 'fastify-auth';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
+import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
 import webpackConfig from '../webpack.config.babel.js';
-import Rollbar from 'rollbar';
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
@@ -91,7 +91,7 @@ const addHooks = (app) => {
 
 const registerPlugins = (app) => {
   app.register(fastifyAuth);
-  app.register(fastifySensible, { errorHandler: false } );
+  app.register(fastifySensible, { errorHandler: false });
   if (process.env.NODE_ENV !== 'production') app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes.plugin);
   app.register(fastifyFormbody, { parser: qs.parse });
@@ -101,11 +101,11 @@ const registerPlugins = (app) => {
       path: '/',
     },
   });
-  app.setErrorHandler( (error, request, reply) => {
+  app.setErrorHandler((error, request, reply) => {
     rollbar.log(error);
     request.flash('error', error.message);
     reply.redirect('/');
-  })
+  });
 
   fastifyPassport.registerUserDeserializer((user) => app
     .objection.models.user.query().findById(user.id));

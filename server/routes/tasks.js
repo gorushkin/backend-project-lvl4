@@ -28,7 +28,9 @@ export default (app) => {
     .post('/tasks', { name: 'taskCreate', preValidation: app.authenticate }, async (req, reply) => {
       const {
         body: {
-          data: { name, description, statusId, executorId, labels = [] },
+          data: {
+            name, description, statusId, executorId, labels = [],
+          },
         },
       } = req;
 
@@ -88,7 +90,7 @@ export default (app) => {
           reply.render('tasks/details', { task });
         }
         return reply;
-      }
+      },
     )
     .get(
       '/tasks/:id/edit',
@@ -107,7 +109,7 @@ export default (app) => {
           labels,
         });
         return reply;
-      }
+      },
     )
     .patch(
       '/tasks/:id',
@@ -116,7 +118,9 @@ export default (app) => {
         try {
           const {
             body: {
-              data: { name, executorId, statusId, description, labels = [] },
+              data: {
+                name, executorId, statusId, description, labels = [],
+              },
             },
           } = req;
           const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
@@ -133,7 +137,7 @@ export default (app) => {
               {
                 relate: true,
                 unrelate: true,
-              }
+              },
             );
           });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
@@ -147,7 +151,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .delete(
       '/tasks/:id',
@@ -166,6 +170,6 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.delete.success'));
         reply.redirect('/tasks');
         return reply;
-      }
+      },
     );
 };

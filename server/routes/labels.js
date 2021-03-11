@@ -31,7 +31,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .get(
       '/labels/:id/edit',
@@ -40,7 +40,7 @@ export default (app) => {
         const label = await app.objection.models.label.query().findById(req.params.id);
         reply.render('labels/edit', { label });
         return reply;
-      }
+      },
     )
     .patch(
       '/labels/:id',
@@ -63,7 +63,7 @@ export default (app) => {
           }
           throw error;
         }
-      }
+      },
     )
     .delete(
       '/labels/:id',
@@ -79,6 +79,6 @@ export default (app) => {
         }
         reply.redirect('/labels');
         return reply;
-      }
+      },
     );
 };
