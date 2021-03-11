@@ -20,7 +20,7 @@ import Pug from 'pug';
 import i18next from 'i18next';
 import ru from './locales/ru.js';
 import webpackConfig from '../webpack.config.babel.js';
-
+import Rollbar from 'rollbar';
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
@@ -31,6 +31,12 @@ dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
 const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
+
+const rollbar = new Rollbar({
+  accessToken: process.env.POST_SERVER_ITEM_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 const setUpViews = (app) => {
   const { devServer } = webpackConfig;
@@ -85,8 +91,8 @@ const addHooks = (app) => {
 
 const registerPlugins = (app) => {
   app.register(fastifyAuth);
-  app.register(fastifySensible);
-  app.register(fastifyErrorPage);
+  app.register(fastifySensible, { errorHandler: false } );
+  if (process.env.NODE_ENV !== 'production') app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes.plugin);
   app.register(fastifyFormbody, { parser: qs.parse });
   app.register(fastifySecureSession, {
@@ -95,6 +101,11 @@ const registerPlugins = (app) => {
       path: '/',
     },
   });
+  app.setErrorHandler( (error, request, reply) => {
+    rollbar.log(error);
+    request.flash('error', error.message);
+    reply.redirect('/');
+  })
 
   fastifyPassport.registerUserDeserializer((user) => app
     .objection.models.user.query().findById(user.id));
