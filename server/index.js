@@ -89,15 +89,15 @@ const addHooks = (app) => {
 
 const addErrorHadlers = (app) => {
   app.setErrorHandler((error, request, reply) => {
-    const err =
-      reply.raw.statusCode === 500 && error.explicitInternalServerError !== true
-        ? 'Something went wrong!!!'
-        : error;
+    const errorMessage = reply.raw.statusCode === 500
+      && error.explicitInternalServerError !== true
+      ? 'Something went wrong!!!'
+      : error;
     if (isProduction) rollbar.log(error);
-    request.flash('error', err);
+    request.flash('error', errorMessage);
     reply.redirect('/');
   });
-}
+};
 
 const registerPlugins = (app) => {
   app.register(fastifyAuth);
@@ -111,20 +111,18 @@ const registerPlugins = (app) => {
     },
   });
 
-  fastifyPassport.registerUserDeserializer((user) =>
-    app.objection.models.user.query().findById(user.id)
+  fastifyPassport.registerUserDeserializer(
+    (user) => app.objection.models.user.query().findById(user.id),
   );
   fastifyPassport.registerUserSerializer((user) => Promise.resolve(user));
   fastifyPassport.use(new FormStrategy('form', app));
   app.register(fastifyPassport.initialize());
   app.register(fastifyPassport.secureSession());
   app.decorate('fp', fastifyPassport);
-  app.decorate('authenticate', (...args) =>
-    fastifyPassport.authenticate('form', {
-      failureRedirect: app.reverse('root'),
-      failureFlash: i18next.t('flash.authError'),
-    })(...args)
-  );
+  app.decorate('authenticate', (...args) => fastifyPassport.authenticate('form', {
+    failureRedirect: app.reverse('root'),
+    failureFlash: i18next.t('flash.authError'),
+  })(...args));
 
   app.register(fastifyMethodOverride);
   app.register(fastifyObjectionjs, {
@@ -151,8 +149,6 @@ const registerPlugins = (app) => {
     return reply;
   });
 };
-
-
 
 export default () => {
   const app = fastify({
