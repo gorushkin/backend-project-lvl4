@@ -9,8 +9,6 @@ import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
-import fastifySensible from 'fastify-sensible';
-// import fastifyFlash from 'fastify-flash';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
@@ -89,10 +87,21 @@ const addHooks = (app) => {
   });
 };
 
+const addErrorHadlers = (app) => {
+  app.setErrorHandler((error, request, reply) => {
+    const err =
+      reply.raw.statusCode === 500 && error.explicitInternalServerError !== true
+        ? 'Something went wrong!!!'
+        : error;
+    if (isProduction) rollbar.log(error);
+    request.flash('error', err);
+    reply.redirect('/');
+  });
+}
+
 const registerPlugins = (app) => {
   app.register(fastifyAuth);
-  app.register(fastifySensible, { errorHandler: false });
-  if (process.env.NODE_ENV !== 'production') app.register(fastifyErrorPage);
+  if (isDevelopment) app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes.plugin);
   app.register(fastifyFormbody, { parser: qs.parse });
   app.register(fastifySecureSession, {
@@ -100,18 +109,6 @@ const registerPlugins = (app) => {
     cookie: {
       path: '/',
     },
-  });
-  app.setErrorHandler((error, request, reply) => {
-    if (reply.raw.statusCode === 500 && error.explicitInternalServerError !== true) {
-      request.log.error(error);
-      if (process.env.NODE_ENV !== 'production') {
-        rollbar.log(error);
-        request.flash('error', error.message);
-        reply.redirect('/');
-      }
-    } else {
-      reply.send(error);
-    }
   });
 
   fastifyPassport.registerUserDeserializer((user) =>
@@ -155,6 +152,8 @@ const registerPlugins = (app) => {
   });
 };
 
+
+
 export default () => {
   const app = fastify({
     logger: {
@@ -163,7 +162,7 @@ export default () => {
   });
 
   registerPlugins(app);
-
+  addErrorHadlers(app);
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);
