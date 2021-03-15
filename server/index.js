@@ -102,23 +102,32 @@ const registerPlugins = (app) => {
     },
   });
   app.setErrorHandler((error, request, reply) => {
-    rollbar.log(error);
-    request.flash('error', error.message);
-    reply.redirect('/');
+    if (reply.raw.statusCode === 500 && error.explicitInternalServerError !== true) {
+      request.log.error(error);
+      if (process.env.NODE_ENV !== 'production') {
+        rollbar.log(error);
+        request.flash('error', error.message);
+        reply.redirect('/');
+      }
+    } else {
+      reply.send(error);
+    }
   });
 
-  fastifyPassport.registerUserDeserializer((user) => app
-    .objection.models.user.query().findById(user.id));
+  fastifyPassport.registerUserDeserializer((user) =>
+    app.objection.models.user.query().findById(user.id)
+  );
   fastifyPassport.registerUserSerializer((user) => Promise.resolve(user));
   fastifyPassport.use(new FormStrategy('form', app));
   app.register(fastifyPassport.initialize());
   app.register(fastifyPassport.secureSession());
   app.decorate('fp', fastifyPassport);
-  app.decorate('authenticate', (...args) => fastifyPassport
-    .authenticate('form', {
+  app.decorate('authenticate', (...args) =>
+    fastifyPassport.authenticate('form', {
       failureRedirect: app.reverse('root'),
       failureFlash: i18next.t('flash.authError'),
-    })(...args));
+    })(...args)
+  );
 
   app.register(fastifyMethodOverride);
   app.register(fastifyObjectionjs, {
