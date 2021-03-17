@@ -91,10 +91,10 @@ const addErrorHadlers = (app) => {
   app.setErrorHandler((error, request, reply) => {
     const isUnhandledInternalError = reply.raw.statusCode === 500
       && error.explicitInternalServerError !== true;
+    const errorMessage = isUnhandledInternalError ? 'Something went wrong!!!' : error.message;
     request.log.error(error);
     if (isProduction) rollbar.log(error);
-    error.message = isUnhandledInternalError ? 'Something went wrong!!!' : error;
-    request.flash('error', error.message);
+    request.flash('error', errorMessage);
     reply.redirect('/');
   });
 };
