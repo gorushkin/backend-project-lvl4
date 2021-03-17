@@ -34,7 +34,6 @@ export default (app) => {
         return reply;
       } catch (error) {
         if (error instanceof app.objection.models.user.ValidationError) {
-          console.log('case1');
           req.flash('error', i18next.t('flash.users.create.error'));
           reply.render('users/new', { user: req.body.data, errors: error.data });
           return reply;

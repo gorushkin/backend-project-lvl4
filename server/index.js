@@ -89,12 +89,12 @@ const addHooks = (app) => {
 
 const addErrorHadlers = (app) => {
   app.setErrorHandler((error, request, reply) => {
-    const errorMessage = reply.raw.statusCode === 500
-      && error.explicitInternalServerError !== true
-      ? 'Something went wrong!!!'
-      : error;
+    const isUnhandledInternalError = reply.raw.statusCode === 500
+      && error.explicitInternalServerError !== true;
+    request.log.error(error);
     if (isProduction) rollbar.log(error);
-    request.flash('error', errorMessage);
+    error.message = isUnhandledInternalError ? 'Something went wrong!!!' : error;
+    request.flash('error', error.message);
     reply.redirect('/');
   });
 };

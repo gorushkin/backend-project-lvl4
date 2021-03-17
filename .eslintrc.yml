@@ -25,3 +25,4 @@ rules:
       ignorePropertyModificationsFor:
       - req
       - reply
+      - error
