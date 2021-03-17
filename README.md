@@ -13,6 +13,13 @@
 
 ## Разработка в докере
 
+1. make image-build - устанвка образа
+1. make container-build - сборка контейнера
+1. make container-start - запуск контейнера
+1. make container-start - запуск контейнера
+1. make container-test - запуск тестов в контейнере
+1. make container-lint- запуск линтера в контейнере
+
 * make compose-setup Установка
 * make compose-build - пересборка контейнера
 * make compose-app-setup - установка необходимых зависимостей

@@ -8,3 +8,5 @@ WORKDIR /srv/task-manager/
 COPY ./package*.json /srv/task-manager/
 
 RUN npm clean-install
+
+CMD make start
