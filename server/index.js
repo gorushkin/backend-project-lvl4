@@ -9,8 +9,6 @@ import pointOfView from 'point-of-view';
 import fastifyFormbody from 'fastify-formbody';
 import fastifySecureSession from 'fastify-secure-session';
 import fastifyPassport from 'fastify-passport';
-import fastifySensible from 'fastify-sensible';
-// import fastifyFlash from 'fastify-flash';
 import fastifyReverseRoutes from 'fastify-reverse-routes';
 import fastifyMethodOverride from 'fastify-method-override';
 import fastifyObjectionjs from 'fastify-objectionjs';
@@ -18,9 +16,9 @@ import fastifyAuth from 'fastify-auth';
 import qs from 'qs';
 import Pug from 'pug';
 import i18next from 'i18next';
+import Rollbar from 'rollbar';
 import ru from './locales/ru.js';
 import webpackConfig from '../webpack.config.babel.js';
-
 import addRoutes from './routes/index.js';
 import getHelpers from './helpers/index.js';
 import knexConfig from '../knexfile.js';
@@ -31,6 +29,12 @@ dotenv.config();
 const mode = process.env.NODE_ENV || 'development';
 const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
+
+const rollbar = new Rollbar({
+  accessToken: process.env.POST_SERVER_ITEM_ACCESS_TOKEN,
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
 
 const setUpViews = (app) => {
   const { devServer } = webpackConfig;
@@ -83,10 +87,21 @@ const addHooks = (app) => {
   });
 };
 
+const addErrorHadlers = (app) => {
+  app.setErrorHandler((error, request, reply) => {
+    const isUnhandledInternalError = reply.raw.statusCode === 500
+      && error.explicitInternalServerError !== true;
+    const errorMessage = isUnhandledInternalError ? 'Something went wrong!!!' : error.message;
+    request.log.error(error);
+    if (isProduction) rollbar.log(error);
+    request.flash('error', errorMessage);
+    reply.redirect('/');
+  });
+};
+
 const registerPlugins = (app) => {
   app.register(fastifyAuth);
-  app.register(fastifySensible);
-  app.register(fastifyErrorPage);
+  if (isDevelopment) app.register(fastifyErrorPage);
   app.register(fastifyReverseRoutes.plugin);
   app.register(fastifyFormbody, { parser: qs.parse });
   app.register(fastifySecureSession, {
@@ -96,18 +111,18 @@ const registerPlugins = (app) => {
     },
   });
 
-  fastifyPassport.registerUserDeserializer((user) => app
-    .objection.models.user.query().findById(user.id));
+  fastifyPassport.registerUserDeserializer(
+    (user) => app.objection.models.user.query().findById(user.id),
+  );
   fastifyPassport.registerUserSerializer((user) => Promise.resolve(user));
   fastifyPassport.use(new FormStrategy('form', app));
   app.register(fastifyPassport.initialize());
   app.register(fastifyPassport.secureSession());
   app.decorate('fp', fastifyPassport);
-  app.decorate('authenticate', (...args) => fastifyPassport
-    .authenticate('form', {
-      failureRedirect: app.reverse('root'),
-      failureFlash: i18next.t('flash.authError'),
-    })(...args));
+  app.decorate('authenticate', (...args) => fastifyPassport.authenticate('form', {
+    failureRedirect: app.reverse('root'),
+    failureFlash: i18next.t('flash.authError'),
+  })(...args));
 
   app.register(fastifyMethodOverride);
   app.register(fastifyObjectionjs, {
@@ -143,7 +158,7 @@ export default () => {
   });
 
   registerPlugins(app);
-
+  addErrorHadlers(app);
   setupLocalization();
   setUpViews(app);
   setUpStaticAssets(app);

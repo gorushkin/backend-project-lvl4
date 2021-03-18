@@ -88,44 +88,41 @@ export default (app) => {
         req.flash('info', i18next.t('flash.tasks.create.success'));
         reply.redirect(app.reverse('tasks'));
         return reply;
-      } catch ({ data }) {
-        req.flash('error', i18next.t('flash.tasks.create.error'));
-        const [users, statuses, labelList] = await Promise.all([
-          app.objection.models.user.query(),
-          app.objection.models.status.query(),
-          app.objection.models.label.query(),
-        ]);
-        reply.render('/tasks/new', {
-          task: req.body.data,
-          users,
-          statuses,
-          labels: labelList,
-          errors: data,
-        });
-        return reply;
+      } catch (error) {
+        if (error instanceof app.objection.models.task.ValidationError) {
+          req.flash('error', i18next.t('flash.tasks.create.error'));
+          const [users, statuses, labelList] = await Promise.all([
+            app.objection.models.user.query(),
+            app.objection.models.status.query(),
+            app.objection.models.label.query(),
+          ]);
+          reply.render('/tasks/new', {
+            task: req.body.data,
+            users,
+            statuses,
+            labels: labelList,
+            errors: error.data,
+          });
+          return reply;
+        }
+        throw error;
       }
     })
     .get(
       '/tasks/:id',
       { name: 'taskDetails', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const task = await app.objection.models.task
-            .query()
-            .findById(req.params.id)
-            .withGraphJoined('[creator, executor, status, labels]');
-          if (!task) {
-            req.flash('error', i18next.t('flash.tasks.detailsError'));
-            reply.redirect(app.reverse('tasks'));
-          } else {
-            reply.render('tasks/details', { task });
-          }
-          return reply;
-        } catch ({ data }) {
+        const task = await app.objection.models.task
+          .query()
+          .findById(req.params.id)
+          .withGraphJoined('[creator, executor, status, labels]');
+        if (!task) {
           req.flash('error', i18next.t('flash.tasks.detailsError'));
           reply.redirect(app.reverse('tasks'));
-          return reply;
+        } else {
+          reply.render('tasks/details', { task });
         }
+        return reply;
       },
     )
     .get(
@@ -179,10 +176,13 @@ export default (app) => {
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.tasks.edit.error'));
-          reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
-          return reply;
+        } catch (error) {
+          if (error instanceof app.objection.models.task.ValidationError) {
+            req.flash('error', i18next.t('flash.tasks.edit.error'));
+            reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
+            return reply;
+          }
+          throw error;
         }
       },
     )
@@ -193,18 +193,14 @@ export default (app) => {
         preValidation: app.auth([app.checkIfUserCreatedTask, app.authenticate]),
       },
       async (req, reply) => {
-        try {
-          const task = await app.objection.models.task.query().findById(req.params.id);
-          await app.objection.models.task.transaction(async (trx) => {
-            await task
-              .$relatedQuery('labels', trx)
-              .unrelate()
-              .then(() => task.$query(trx).delete());
-          });
-          req.flash('info', i18next.t('flash.tasks.delete.success'));
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.tasks.delete.error'));
-        }
+        const task = await app.objection.models.task.query().findById(req.params.id);
+        await app.objection.models.task.transaction(async (trx) => {
+          await task
+            .$relatedQuery('labels', trx)
+            .unrelate()
+            .then(() => task.$query(trx).delete());
+        });
+        req.flash('info', i18next.t('flash.tasks.delete.success'));
         reply.redirect('/tasks');
         return reply;
       },

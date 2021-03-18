@@ -23,10 +23,13 @@ export default (app) => {
           req.flash('info', i18next.t('flash.statuses.create.success'));
           reply.redirect(app.reverse('statuses'));
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.statuses.create.error'));
-          reply.render('/statuses/new', { status: req.body.data, errors: data });
-          return reply;
+        } catch (error) {
+          if (error instanceof app.objection.models.status.ValidationError) {
+            req.flash('error', i18next.t('flash.statuses.create.error'));
+            reply.render('/statuses/new', { status: req.body.data, errors: error.data });
+            return reply;
+          }
+          throw error;
         }
       },
     )
@@ -52,10 +55,13 @@ export default (app) => {
           req.flash('success', i18next.t('flash.statuses.edit.success'));
           reply.redirect('/statuses');
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.statuses.edit.error'));
-          reply.redirect(app.reverse('statusEdit', { id: req.params.id }));
-          return reply;
+        } catch (error) {
+          if (error instanceof app.objection.models.status.ValidationError) {
+            req.flash('error', i18next.t('flash.statuses.edit.error'));
+            reply.redirect(app.reverse('statusEdit', { id: req.params.id }));
+            return reply;
+          }
+          throw error;
         }
       },
     )
@@ -63,20 +69,16 @@ export default (app) => {
       '/statuses/:id',
       { name: 'statusDelete', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const statusTasks = await app.objection.models.task
-            .query()
-            .withGraphJoined('status')
-            .where('tasks.status_id', '=', req.params.id);
-          if (statusTasks.length !== 0) {
-            req.flash('error', i18next.t('flash.statuses.delete.error'));
-          } else {
-            const status = await app.objection.models.status.query().findById(req.params.id);
-            await status.$query().delete();
-            req.flash('info', i18next.t('flash.statuses.delete.success'));
-          }
-        } catch ({ data }) {
+        const statusTasks = await app.objection.models.task
+          .query()
+          .withGraphJoined('status')
+          .where('tasks.status_id', '=', req.params.id);
+        if (statusTasks.length !== 0) {
           req.flash('error', i18next.t('flash.statuses.delete.error'));
+        } else {
+          const status = await app.objection.models.status.query().findById(req.params.id);
+          await status.$query().delete();
+          req.flash('info', i18next.t('flash.statuses.delete.success'));
         }
         reply.redirect('/statuses');
         return reply;

@@ -23,10 +23,13 @@ export default (app) => {
           req.flash('info', i18next.t('flash.labels.create.success'));
           reply.redirect(app.reverse('labels'));
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.labels.create.error'));
-          reply.render('/labels/new', { label: req.body.data, errors: data });
-          return reply;
+        } catch (error) {
+          if (error instanceof app.objection.models.label.ValidationError) {
+            req.flash('error', i18next.t('flash.labels.create.error'));
+            reply.render('/labels/new', { label: req.body.data, errors: error.data });
+            return reply;
+          }
+          throw error;
         }
       },
     )
@@ -52,10 +55,13 @@ export default (app) => {
           req.flash('success', i18next.t('flash.labels.edit.success'));
           reply.redirect('/labels');
           return reply;
-        } catch ({ data }) {
-          req.flash('error', i18next.t('flash.labels.edit.error'));
-          reply.redirect(app.reverse('labelEdit', { id: req.params.id }));
-          return reply;
+        } catch (error) {
+          if (error instanceof app.objection.models.label.ValidationError) {
+            req.flash('error', i18next.t('flash.labels.edit.error'));
+            reply.redirect(app.reverse('labelEdit', { id: req.params.id }));
+            return reply;
+          }
+          throw error;
         }
       },
     )
