@@ -44,7 +44,6 @@
     "fastify-passport": "^0.1.0",
     "fastify-reverse-routes": "^2.0.0",
     "fastify-secure-session": "^2.3.0",
-    "fastify-sensible": "^3.1.0",
     "fastify-static": "^3.3.0",
     "i18next": "^19.8.4",
     "knex": "^0.21.13",

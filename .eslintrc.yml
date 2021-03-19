@@ -11,7 +11,11 @@ parser: babel-eslint
 env:
   browser: true
   node: true
-  jest: true
+
+overrides:
+  - files: '*.test.js'
+    env:
+      jest: true
 
 rules:
   no-console: 0
