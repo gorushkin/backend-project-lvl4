@@ -29,8 +29,8 @@ export default class Label extends Model {
         join: {
           from: 'labels.id',
           through: {
-            from: 'tasks_labels.label_id',
-            to: 'tasks_labels.task_id',
+            from: 'tasks_labels.labelId',
+            to: 'tasks_labels.taskId',
           },
           to: 'tasks.id',
         },

@@ -6,7 +6,8 @@ export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
       const {
-        query, user: { id },
+        query,
+        user: { id },
       } = req;
 
       const tasksQuery = app.objection.models.task
@@ -71,9 +72,9 @@ export default (app) => {
         const data = {
           name,
           description,
-          status_id: parseInt(statusId, 10),
-          creator_id: req.user.id,
-          executor_id: parseInt(executorId, 10),
+          statusId: parseInt(statusId, 10),
+          creatorId: req.user.id,
+          executorId: parseInt(executorId, 10),
         };
 
         const task = await app.objection.models.task.fromJson(data);

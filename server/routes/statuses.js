@@ -72,7 +72,7 @@ export default (app) => {
         const statusTasks = await app.objection.models.task
           .query()
           .withGraphJoined('status')
-          .where('tasks.status_id', '=', req.params.id);
+          .where('tasks.statusId', '=', req.params.id);
         if (statusTasks.length !== 0) {
           req.flash('error', i18next.t('flash.statuses.delete.error'));
         } else {

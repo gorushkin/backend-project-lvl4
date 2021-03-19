@@ -29,7 +29,7 @@ export default class Status extends unique(Model) {
         modelClass: path.join(__dirname, 'Task'),
         join: {
           from: 'statuses.id',
-          to: 'tasks.status_id',
+          to: 'tasks.statusId',
         },
       },
     };
