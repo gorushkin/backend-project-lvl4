@@ -12,7 +12,6 @@ export const getTestData = () => getFixtureData('testData.json');
 export const prepareData = async (app) => {
   const { knex } = app.objection;
 
-  // получаем данные из фикстур и заполняем БД
   await knex('users').insert(getFixtureData('users.json'));
   await knex('statuses').insert(getFixtureData('statuses.json'));
   await knex('tasks').insert(getFixtureData('tasks.json'));

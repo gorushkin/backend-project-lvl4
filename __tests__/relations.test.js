@@ -20,9 +20,6 @@ describe('test relations CRUD', () => {
   });
 
   beforeEach(async () => {
-    // тесты не должны зависеть друг от друга
-    // перед каждым тестом выполняем миграции
-    // и заполняем БД тестовыми данными
     await knex.migrate.latest();
     await prepareData(app);
     cookie = await getCookie(app, testData.users.another);
@@ -127,7 +124,6 @@ describe('test relations CRUD', () => {
   });
 
   afterEach(async () => {
-    // после каждого теста откатываем миграции
     await knex.migrate.rollback();
   });
 
