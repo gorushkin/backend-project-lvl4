@@ -78,7 +78,7 @@ describe('test statuses CRUD', () => {
 
   it('Edit existing label', async () => {
     const exsistingLabelData = testData.labels.existing;
-    const updatedLabelData = testData.labels.updated;
+    const dataForLabelUpdating = testData.labels.updated;
 
     const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
 
@@ -87,14 +87,14 @@ describe('test statuses CRUD', () => {
       url: app.reverse('labelUpdate', { id }),
       cookies: cookie,
       payload: {
-        data: updatedLabelData,
+        data: dataForLabelUpdating,
       },
     });
 
     expect(response.statusCode).toBe(302);
 
-    const updatedStatus = await models.label.query().findOne({ id });
-    expect(updatedStatus).toMatchObject(updatedLabelData);
+    const updatedStatus = await models.label.query().findById(id);
+    expect(updatedStatus).toMatchObject(dataForLabelUpdating);
   });
 
   it('Delete existing label', async () => {
@@ -110,11 +110,11 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const deletedStatus = await models.label.query().findOne({ id });
+    const deletedStatus = await models.label.query().findById(id);
     expect(deletedStatus).toBeUndefined();
   });
 
-  it('add relations', async () => {
+  it('Create task with labelId should create task-label relation', async () => {
     const taskData = testData.tasks.existingWithLabels;
     const expected = testData.labels.related;
 

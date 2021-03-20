@@ -122,7 +122,7 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const updatedStatus = await models.status.query().findOne({ id });
+    const updatedStatus = await models.status.query().findById(id);
     expect(updatedStatus).toMatchObject(updatedStatusData);
   });
 
@@ -139,7 +139,7 @@ describe('test statuses CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const deletedStatus = await models.status.query().findOne({ id });
+    const deletedStatus = await models.status.query().findById(id);
     expect(deletedStatus).toBeUndefined();
   });
 

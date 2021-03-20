@@ -90,7 +90,7 @@ describe('test users CRUD', () => {
     });
     expect(response.statusCode).toBe(302);
 
-    const updatedUser = await models.user.query().findOne({ id });
+    const updatedUser = await models.user.query().findById(id);
     const expected = {
       ..._.omit(updatedUserData, 'password'),
       passwordDigest: encrypt(updatedUserData.password),
@@ -114,7 +114,7 @@ describe('test users CRUD', () => {
     });
     expect(response.statusCode).toBe(302);
 
-    const notUpdatedUser = await models.user.query().findOne({ id });
+    const notUpdatedUser = await models.user.query().findById(id);
     const expected = {
       ..._.omit(notUpdatedUser, 'password'),
       passwordDigest: encrypt(anotherUserData.password),
@@ -139,7 +139,7 @@ describe('test users CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const notUpdatedUser = await models.user.query().findOne({ id });
+    const notUpdatedUser = await models.user.query().findById(id);
     const expected = {
       ..._.omit(notUpdatedUser, 'password'),
       passwordDigest: encrypt(anotherUserData.password),
@@ -159,7 +159,7 @@ describe('test users CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const deletedUser = await models.user.query().findOne({ id });
+    const deletedUser = await models.user.query().findById(id);
     expect(deletedUser).toEqual(undefined);
   });
 
@@ -176,7 +176,7 @@ describe('test users CRUD', () => {
 
     expect(response.statusCode).toBe(302);
 
-    const unDeletedUser = await models.user.query().findOne({ id });
+    const unDeletedUser = await models.user.query().findById(id);
     expect(anotherUser).toMatchObject(unDeletedUser);
   });
 
