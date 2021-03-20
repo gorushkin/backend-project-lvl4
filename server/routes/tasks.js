@@ -76,12 +76,12 @@ export default (app) => {
         };
 
         if (statusId) {
-          data.statusId = parseInt(statusId, 10)
-        };
+          data.statusId = parseInt(statusId, 10);
+        }
 
         if (executorId) {
-          data.executorId = parseInt(executorId, 10)
-        };
+          data.executorId = parseInt(executorId, 10);
+        }
 
         const task = await app.objection.models.task.fromJson(data);
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
@@ -174,11 +174,11 @@ export default (app) => {
           };
 
           if (statusId) {
-            data.statusId = parseInt(statusId, 10)
-          };
+            data.statusId = parseInt(statusId, 10);
+          }
 
           if (executorId) {
-            data.executorId = parseInt(executorId, 10)
+            data.executorId = parseInt(executorId, 10);
           }
 
           await app.objection.models.task.transaction(async (trx) => {
@@ -194,7 +194,6 @@ export default (app) => {
           reply.redirect('/tasks');
           return reply;
         } catch (error) {
-          console.log('error: ', error);
           if (error instanceof app.objection.models.task.ValidationError) {
             req.flash('error', i18next.t('flash.tasks.edit.error'));
             const [task, users, statuses, labels] = await Promise.all([

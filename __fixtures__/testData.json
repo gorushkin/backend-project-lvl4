@@ -86,6 +86,22 @@
       "statusId": 1,
       "creatorId": 4,
       "executorId": 1
+    },
+    "withLabelsUpdated1": {
+      "name": "task1",
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 4,
+      "executorId": 1,
+      "labels": [11, 12, 13]
+    },
+    "withLabelsUpdated2": {
+      "name": "task1",
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 4,
+      "executorId": 1,
+      "labels": [13]
     }
   },
   "labels": {
