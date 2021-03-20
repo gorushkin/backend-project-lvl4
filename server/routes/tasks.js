@@ -72,9 +72,15 @@ export default (app) => {
         const data = {
           name,
           description,
-          statusId: parseInt(statusId, 10),
           creatorId: req.user.id,
-          executorId: parseInt(executorId, 10),
+        };
+
+        if (statusId) {
+          data.statusId = parseInt(statusId, 10)
+        };
+
+        if (executorId) {
+          data.executorId = parseInt(executorId, 10)
         };
 
         const task = await app.objection.models.task.fromJson(data);
