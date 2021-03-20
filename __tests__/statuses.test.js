@@ -44,7 +44,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(302);
   });
 
-  it('Get statuses create page work', async () => {
+  it('Get statuses create status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newStatus'),
@@ -54,7 +54,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get statuses edit page work', async () => {
+  it('Get statuses edit status code is 200', async () => {
     const exsistingStatusData = testData.statuses.existing;
     const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
 
@@ -67,7 +67,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Create new status', async () => {
+  it('User can create new status', async () => {
     const expected = testData.statuses.new;
 
     const response = await app.inject({
@@ -85,7 +85,7 @@ describe('test statuses CRUD', () => {
     expect(status).toMatchObject(expected);
   });
 
-  it('Can not create status with existing name', async () => {
+  it('Use can not create status with existing name', async () => {
     const exsistingStatusData = testData.statuses.existing;
 
     const expectedStatuses = await models.status.query();
@@ -105,7 +105,7 @@ describe('test statuses CRUD', () => {
     expect(updatedStatuses).toMatchObject(expectedStatuses);
   });
 
-  it('Edit existing status', async () => {
+  it('User can edit existing status', async () => {
     const exsistingStatusData = testData.statuses.existing;
     const updatedStatusData = testData.statuses.updated;
 
@@ -126,7 +126,7 @@ describe('test statuses CRUD', () => {
     expect(updatedStatus).toMatchObject(updatedStatusData);
   });
 
-  it('Delete existing status', async () => {
+  it('USer can delete existing status', async () => {
     const exsistingStatusData = testData.statuses.existing;
 
     const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });

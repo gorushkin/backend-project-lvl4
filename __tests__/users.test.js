@@ -27,7 +27,7 @@ describe('test users CRUD', () => {
     cookie = await getCookie(app, testData.users.existing);
   });
 
-  it('"user list" template`s status code is 200', async () => {
+  it('Users page status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('users'),
@@ -36,7 +36,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('"user create" template`s status code is 200', async () => {
+  it('New user creating page status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newUser'),
@@ -45,7 +45,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('"user edit" template`s status code is 200', async () => {
+  it('User updating page status code is 200', async () => {
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
     const response = await app.inject({
@@ -57,7 +57,7 @@ describe('test users CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('user create', async () => {
+  it('Anyone can create new user profile', async () => {
     const params = testData.users.new;
     const response = await app.inject({
       method: 'POST',
@@ -76,7 +76,7 @@ describe('test users CRUD', () => {
     expect(user).toMatchObject(expected);
   });
 
-  it('user update', async () => {
+  it('User can update his user data', async () => {
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
     const updatedUserData = testData.users.updated;
@@ -98,7 +98,7 @@ describe('test users CRUD', () => {
     expect(updatedUser).toMatchObject(expected);
   });
 
-  it('user can not edit another user data', async () => {
+  it('User can not edit another user data', async () => {
     const existingUserData = testData.users.existing;
     const anotherUserData = testData.users.another;
     const user = await models.user.query().findOne({ email: anotherUserData.email });
@@ -122,7 +122,7 @@ describe('test users CRUD', () => {
     expect(notUpdatedUser).toMatchObject(expected);
   });
 
-  it('try patch another user profile', async () => {
+  it('User can not patch another user profile', async () => {
     const existingUserData = testData.users.existing;
     const anotherUserData = testData.users.another;
     const user = await models.user.query().findOne({ email: anotherUserData.email });
@@ -147,7 +147,7 @@ describe('test users CRUD', () => {
     expect(notUpdatedUser).toMatchObject(expected);
   });
 
-  it('user delete', async () => {
+  it('User can delete his user profile', async () => {
     const existingUserData = testData.users.existing;
     const { id } = await models.user.query().findOne({ email: existingUserData.email });
 
@@ -163,7 +163,7 @@ describe('test users CRUD', () => {
     expect(deletedUser).toEqual(undefined);
   });
 
-  it('user can not delete another user', async () => {
+  it('User can not delete another user profile', async () => {
     const anotherUserData = testData.users.another;
     const anotherUser = await models.user.query().findOne({ email: anotherUserData.email });
     const { id } = anotherUser;

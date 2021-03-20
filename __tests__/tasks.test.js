@@ -25,7 +25,7 @@ describe('test statuses CRUD', () => {
     cookie = await getCookie(app, testData.users.another);
   });
 
-  it('Create new task', async () => {
+  it('User can create new task', async () => {
     const expected = testData.tasks.new;
 
     const response = await app.inject({
@@ -43,7 +43,7 @@ describe('test statuses CRUD', () => {
     expect(newTask).toMatchObject(expected);
   });
 
-  it('Delete existing task', async () => {
+  it('User can delete existing task', async () => {
     const exsistingTaskData = testData.tasks.existing;
     const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
 
@@ -59,7 +59,7 @@ describe('test statuses CRUD', () => {
     expect(deletedTask).toBeUndefined();
   });
 
-  it('Can not delete task that belongs to anothet user', async () => {
+  it('User can not delete task that belongs to anothet user', async () => {
     const anotherTaskData = testData.tasks.another;
     const anotherTask = await models.task.query().findOne({ name: anotherTaskData.name });
     const { id } = anotherTask;

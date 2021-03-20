@@ -25,7 +25,7 @@ describe('labels statuses CRUD', () => {
     cookie = await getCookie(app, testData.users.another);
   });
 
-  it('Get labels page work', async () => {
+  it('Labels page status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('labels'),
@@ -35,7 +35,7 @@ describe('labels statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get labels create page work', async () => {
+  it('Labels create page  status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newLabel'),
@@ -45,7 +45,7 @@ describe('labels statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Get labels edit page work', async () => {
+  it('Labels edit page  status code is 200', async () => {
     const exsistingLabelData = testData.labels.existing;
     const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
 
@@ -58,7 +58,7 @@ describe('labels statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Create new label', async () => {
+  it('User can create new label', async () => {
     const expected = testData.labels.new;
 
     const response = await app.inject({
@@ -76,7 +76,7 @@ describe('labels statuses CRUD', () => {
     expect(label).toMatchObject(expected);
   });
 
-  it('Edit existing label', async () => {
+  it('Usewr can edit existing label', async () => {
     const exsistingLabelData = testData.labels.existing;
     const dataForLabelUpdating = testData.labels.updated;
 
@@ -97,7 +97,7 @@ describe('labels statuses CRUD', () => {
     expect(updatedStatus).toMatchObject(dataForLabelUpdating);
   });
 
-  it('Delete existing label', async () => {
+  it('User can delete existing label', async () => {
     const exsistingLabelData = testData.labels.existing;
 
     const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
