@@ -163,17 +163,27 @@ export default (app) => {
               },
             },
           } = req;
+
           const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+
+          const data = {
+            name,
+            description,
+            labels: labelIds,
+            id: parseInt(req.params.id, 10),
+          };
+
+          if (statusId) {
+            data.statusId = parseInt(statusId, 10)
+          };
+
+          if (executorId) {
+            data.executorId = parseInt(executorId, 10)
+          }
+
           await app.objection.models.task.transaction(async (trx) => {
             await app.objection.models.task.query(trx).upsertGraph(
-              {
-                id: parseInt(req.params.id, 10),
-                name,
-                executorId,
-                description,
-                statusId,
-                labels: labelIds,
-              },
+              data,
               {
                 relate: true,
                 unrelate: true,
@@ -184,9 +194,23 @@ export default (app) => {
           reply.redirect('/tasks');
           return reply;
         } catch (error) {
+          console.log('error: ', error);
           if (error instanceof app.objection.models.task.ValidationError) {
             req.flash('error', i18next.t('flash.tasks.edit.error'));
-            reply.redirect(app.reverse('taskEdit', { id: req.params.id }));
+            const [task, users, statuses, labels] = await Promise.all([
+              app.objection.models.task.query().findById(req.params.id).withGraphJoined('labels'),
+              app.objection.models.user.query(),
+              app.objection.models.status.query(),
+              app.objection.models.label.query(),
+            ]);
+            reply.render('tasks/edit', {
+              task,
+              users,
+              statuses,
+              labels,
+              errors: error.data,
+            });
+
             return reply;
           }
           throw error;
