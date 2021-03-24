@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
 
 export default (app) => {
   app
@@ -33,7 +34,7 @@ export default (app) => {
         reply.redirect(app.reverse('root'));
         return reply;
       } catch (error) {
-        if (error instanceof app.objection.models.user.ValidationError) {
+        if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.users.create.error'));
           reply.render('users/new', { user: req.body.data, errors: error.data });
           return reply;
@@ -58,7 +59,7 @@ export default (app) => {
           reply.redirect('/users');
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.user.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.users.edit.error'));
             reply.redirect(app.reverse('userEdit', { id: req.params.id }));
             return reply;

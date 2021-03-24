@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
 
 export default (app) => {
   app
@@ -24,7 +25,7 @@ export default (app) => {
           reply.redirect(app.reverse('labels'));
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.label.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.create.error'));
             reply.render('/labels/new', { label: req.body.data, errors: error.data });
             return reply;
@@ -56,7 +57,7 @@ export default (app) => {
           reply.redirect('/labels');
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.label.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
             reply.redirect(app.reverse('labelEdit', { id: req.params.id }));
             return reply;

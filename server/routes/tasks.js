@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
 
 export default (app) => {
   app
@@ -96,7 +97,7 @@ export default (app) => {
         reply.redirect(app.reverse('tasks'));
         return reply;
       } catch (error) {
-        if (error instanceof app.objection.models.task.ValidationError) {
+        if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.tasks.create.error'));
           const [users, statuses, labelList] = await Promise.all([
             app.objection.models.user.query(),
@@ -194,7 +195,7 @@ export default (app) => {
           reply.redirect('/tasks');
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.task.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.tasks.edit.error'));
             const [task, users, statuses, labels] = await Promise.all([
               app.objection.models.task.query().findById(req.params.id).withGraphJoined('labels'),

@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import { ValidationError } from 'objection';
 
 export default (app) => {
   app
@@ -24,7 +25,7 @@ export default (app) => {
           reply.redirect(app.reverse('statuses'));
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.status.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.statuses.create.error'));
             reply.render('/statuses/new', { status: req.body.data, errors: error.data });
             return reply;
@@ -56,7 +57,7 @@ export default (app) => {
           reply.redirect('/statuses');
           return reply;
         } catch (error) {
-          if (error instanceof app.objection.models.status.ValidationError) {
+          if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.statuses.edit.error'));
             reply.redirect(app.reverse('statusEdit', { id: req.params.id }));
             return reply;
