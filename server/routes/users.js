@@ -56,12 +56,15 @@ export default (app) => {
           const user = await app.objection.models.user.query().findById(req.params.id);
           await user.$query().patch(data);
           req.flash('success', i18next.t('flash.users.edit.success'));
-          reply.redirect('/users');
+          reply.redirect(app.reverse('users'));
           return reply;
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.users.edit.error'));
-            reply.redirect(app.reverse('userEdit', { id: req.params.id }));
+            reply.render('users/edit', {
+              user: { ...req.body.data, id: req.params.id },
+              errors: error.data,
+            });
             return reply;
           }
           throw error;
@@ -75,14 +78,11 @@ export default (app) => {
         preValidation: app.auth([app.checkIfUserCanEditProfile, app.authenticate]),
       },
       async (req, reply) => {
-        const usersTasks = await app.objection.models.user
-          .query()
-          .findById(req.params.id)
-          .withGraphJoined('tasks');
-        if (usersTasks.tasks.length !== 0) {
+        const user = await app.objection.models.user.query().findById(req.params.id);
+        const usersTasks = await user.$relatedQuery('tasks');
+        if (usersTasks.length !== 0) {
           req.flash('error', i18next.t('flash.users.delete.error'));
         } else {
-          const user = await app.objection.models.user.query().findById(req.params.id);
           await user.$query().delete();
           req.logOut();
           req.flash('info', i18next.t('flash.users.delete.success'));
