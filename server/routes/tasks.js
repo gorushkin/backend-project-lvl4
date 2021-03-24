@@ -79,9 +79,8 @@ export default (app) => {
         executorId: executorId ? parseInt(executorId, 10) : undefined,
       };
 
-      const task = await app.objection.models.task.fromJson(data);
-
       try {
+        const task = await app.objection.models.task.fromJson(data);
 
         await app.objection.models.task.transaction(async (trx) => {
           await app.objection.models.task.query(trx).insertGraph([{ ...task, labels: labelIds }], {
@@ -152,40 +151,32 @@ export default (app) => {
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
-        try {
-          const {
-            body: {
-              data: {
-                name, executorId, statusId, description, labels = [],
-              },
+        const {
+          body: {
+            data: {
+              name, executorId, statusId, description, labels = [],
             },
-          } = req;
+          },
+        } = req;
 
-          const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+        const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-          const data = {
-            name,
-            description,
-            labels: labelIds,
-            id: parseInt(req.params.id, 10),
-          };
+        const data = {
+          name,
+          description,
+          labels: labelIds,
+          id: parseInt(req.params.id, 10),
+          creatorId: req.user.id,
+          statusId: statusId ? parseInt(statusId, 10) : undefined,
+          executorId: executorId ? parseInt(executorId, 10) : undefined,
+        };
 
-          if (statusId) {
-            data.statusId = parseInt(statusId, 10);
-          }
-
-          if (executorId) {
-            data.executorId = parseInt(executorId, 10);
-          }
-
+        try {
           await app.objection.models.task.transaction(async (trx) => {
-            await app.objection.models.task.query(trx).upsertGraph(
-              data,
-              {
-                relate: true,
-                unrelate: true,
-              },
-            );
+            await app.objection.models.task.query(trx).upsertGraph(data, {
+              relate: true,
+              unrelate: true,
+            });
           });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');
@@ -224,8 +215,8 @@ export default (app) => {
         await app.objection.models.task.transaction(async (trx) => {
           await task
             .$relatedQuery('labels', trx)
-            .unrelate()
-            .then(() => task.$query(trx).delete());
+            .unrelate();
+          await task.$query(trx).delete()
         });
         req.flash('info', i18next.t('flash.tasks.delete.success'));
         reply.redirect('/tasks');
