@@ -123,7 +123,7 @@ describe('test statuses CRUD', () => {
     expect(updatedStatus).toMatchObject(updatedStatusData);
   });
 
-  it('USer can delete existing status', async () => {
+  it('User can delete existing status', async () => {
     const exsistingStatusData = testData.statuses.existing;
 
     const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
