@@ -94,13 +94,14 @@ export default (app) => {
       } catch (error) {
         if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.tasks.create.error'));
+          const task = (new app.objection.models.task).$set(req.body.data);
           const [users, statuses, labelList] = await Promise.all([
             app.objection.models.user.query(),
             app.objection.models.status.query(),
             app.objection.models.label.query(),
           ]);
           reply.render('/tasks/new', {
-            task: req.body.data,
+            task,
             users,
             statuses,
             labels: labelList,
