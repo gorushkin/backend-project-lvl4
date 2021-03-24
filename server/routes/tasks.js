@@ -46,7 +46,7 @@ export default (app) => {
       });
       return reply;
     })
-    .get('/tasks/new', { name: 'newTask', preValidation: app.authenticate }, async (req, reply) => {
+    .get('/tasks/new', { name: 'taskNew', preValidation: app.authenticate }, async (req, reply) => {
       const task = new app.objection.models.task();
       const [users, statuses, labels] = await Promise.all([
         app.objection.models.user.query(),
@@ -69,23 +69,19 @@ export default (app) => {
         },
       } = req;
 
+      const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+
+      const data = {
+        name,
+        description,
+        creatorId: req.user.id,
+        statusId: statusId ? parseInt(statusId, 10) : undefined,
+        executorId: executorId ? parseInt(executorId, 10) : undefined,
+      };
+
+      const task = await app.objection.models.task.fromJson(data);
+
       try {
-        const data = {
-          name,
-          description,
-          creatorId: req.user.id,
-        };
-
-        if (statusId) {
-          data.statusId = parseInt(statusId, 10);
-        }
-
-        if (executorId) {
-          data.executorId = parseInt(executorId, 10);
-        }
-
-        const task = await app.objection.models.task.fromJson(data);
-        const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
         await app.objection.models.task.transaction(async (trx) => {
           await app.objection.models.task.query(trx).insertGraph([{ ...task, labels: labelIds }], {
