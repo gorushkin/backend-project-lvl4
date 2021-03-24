@@ -35,7 +35,7 @@ describe('labels statuses CRUD', () => {
   it('Labels create page  status code is 200', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: app.reverse('newLabel'),
+      url: app.reverse('labelNew'),
       cookies: cookie,
     });
 

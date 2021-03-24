@@ -10,7 +10,7 @@ export default (app) => {
       reply.render('labels/index', { labels });
       return reply;
     })
-    .get('/labels/new', { name: 'newLabel', preValidation: app.authenticate }, (req, reply) => {
+    .get('/labels/new', { name: 'labelNew', preValidation: app.authenticate }, (req, reply) => {
       const label = new app.objection.models.label();
       reply.render('labels/new', { label });
     })
@@ -59,7 +59,7 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
-            reply.redirect(app.reverse('labelEdit', { id: req.params.id }));
+            reply.render(app.reverse('labelEdit', { id: req.params.id }));
             return reply;
           }
           throw error;
@@ -78,7 +78,7 @@ export default (app) => {
           await label.$query().delete();
           req.flash('info', i18next.t('flash.labels.delete.success'));
         }
-        reply.redirect('/labels');
+        reply.redirect(app.reverse('labels'));
         return reply;
       },
     );
