@@ -59,7 +59,12 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
-            reply.render(app.reverse('labelEdit', { id: req.params.id }));
+            reply.render(
+              app.reverse('labelEdit', {
+                label: { ...req.body.data, id: req.params.id },
+                errors: error.data,
+              })
+            );
             return reply;
           }
           throw error;
