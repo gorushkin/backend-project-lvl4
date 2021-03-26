@@ -94,7 +94,7 @@ export default (app) => {
       } catch (error) {
         if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.tasks.create.error'));
-          const task = (new app.objection.models.task).$set(req.body.data);
+          const task = (new app.objection.models.task()).$set(req.body.data);
           const [users, statuses, labelList] = await Promise.all([
             app.objection.models.user.query(),
             app.objection.models.status.query(),
@@ -185,7 +185,7 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.tasks.edit.error'));
-            const [task, users, statuses, labels] = await Promise.all([
+            const [task, users, statuses, taskLabels] = await Promise.all([
               app.objection.models.task.query().findById(req.params.id).withGraphJoined('labels'),
               app.objection.models.user.query(),
               app.objection.models.status.query(),
@@ -195,7 +195,7 @@ export default (app) => {
               task,
               users,
               statuses,
-              labels,
+              labels: taskLabels,
               errors: error.data,
             });
 
@@ -217,7 +217,7 @@ export default (app) => {
           await task
             .$relatedQuery('labels', trx)
             .unrelate();
-          await task.$query(trx).delete()
+          await task.$query(trx).delete();
         });
         req.flash('info', i18next.t('flash.tasks.delete.success'));
         reply.redirect('/tasks');

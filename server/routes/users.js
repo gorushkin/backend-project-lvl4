@@ -36,8 +36,8 @@ export default (app) => {
       } catch (error) {
         if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.users.create.error'));
-          const user = (new app.objection.models.user).$set(req.body.data);
-          reply.render('users/new', { user, errors: error.data  });
+          const user = (new app.objection.models.user()).$set(req.body.data);
+          reply.render('users/new', { user, errors: error.data });
           return reply;
         }
         throw error;

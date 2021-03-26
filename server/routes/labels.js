@@ -63,7 +63,7 @@ export default (app) => {
               app.reverse('labelEdit', {
                 label: { ...req.body.data, id: req.params.id },
                 errors: error.data,
-              })
+              }),
             );
             return reply;
           }
