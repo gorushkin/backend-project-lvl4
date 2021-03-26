@@ -46,10 +46,38 @@ describe('test relations CRUD', () => {
     expect(label).toMatchObject(expectedRelatedLabel);
   });
 
-  it('Update task with one labelId relation should update only label relations', async () => {
+  it('Update task with adding labelId relation should add one label relations', async () => {
     const taskData = testData.tasks.existing;
-    const expectedRelatedLabelId = testData.labels.relatedUpdate;
-    console.log('expectedRelatedLabelId: ', expectedRelatedLabelId);
+    const expectedRelatedLabelId = testData.labels.relatedAdd;
+
+    const task = await models.task.query().findOne({ 'tasks.name': taskData.name });
+    const { id } = task;
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: app.reverse('taskUpdate', { id }),
+      cookies: cookie,
+      payload: {
+        data: { ...taskData, labels: expectedRelatedLabelId },
+      },
+    });
+
+    const { labels } = await models.task
+      .query()
+      .findOne({ 'tasks.name': taskData.name })
+      .withGraphJoined('[creator, executor, status, labels]');
+
+    labels.forEach(async (label) => {
+      const [upatedTask] = await label.$relatedQuery('tasks');
+      expect(task).toMatchObject(upatedTask);
+    });
+
+    expect(response.statusCode).toBe(302);
+  });
+
+  it('Update task with removing labelId relation should removing one label relations', async () => {
+    const taskData = testData.tasks.existing;
+    const expectedRelatedLabelId = testData.labels.relatedRemove;
 
     const task = await models.task.query().findOne({ 'tasks.name': taskData.name });
     const { id } = task;
