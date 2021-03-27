@@ -19,7 +19,9 @@ export default (app) => {
       { name: 'labelCreate', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const label = await app.objection.models.label.fromJson(req.body.data);
+          const label = await app.objection.models.label.fromJson({
+            name: req.body.data.name.trim(),
+          });
           await app.objection.models.label.query().insert(label);
           req.flash('info', i18next.t('flash.labels.create.success'));
           reply.redirect(app.reverse('labels'));
@@ -52,19 +54,17 @@ export default (app) => {
             body: { data },
           } = req;
           const label = await app.objection.models.label.query().findById(req.params.id);
-          await label.$query().patch(data);
+          await label.$query().patch({ name: data.name.trim() });
           req.flash('success', i18next.t('flash.labels.edit.success'));
           reply.redirect('/labels');
           return reply;
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
-            reply.render(
-              app.reverse('labelEdit', {
-                label: { ...req.body.data, id: req.params.id },
+            reply.render('labels/edit', {
+                label: { ...req.body.data, id: `${req.params.id}` },
                 errors: error.data,
-              }),
-            );
+              });
             return reply;
           }
           throw error;

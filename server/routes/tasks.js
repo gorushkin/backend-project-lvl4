@@ -72,8 +72,8 @@ export default (app) => {
       const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
       const data = {
-        name,
-        description,
+        name: name.trim(),
+        description: description.trim(),
         creatorId: req.user.id,
         statusId: statusId ? parseInt(statusId, 10) : undefined,
         executorId: executorId ? parseInt(executorId, 10) : undefined,
@@ -163,7 +163,7 @@ export default (app) => {
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
         const data = {
-          name,
+          name: name.trim(),
           description,
           labels: labelIds,
           id: parseInt(req.params.id, 10),

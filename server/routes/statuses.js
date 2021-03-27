@@ -19,7 +19,7 @@ export default (app) => {
       { name: 'statusCreate', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const status = await app.objection.models.status.fromJson(req.body.data);
+          const status = await app.objection.models.status.fromJson({ name: req.body.data.name.trim() });
           await app.objection.models.status.query().insert(status);
           req.flash('info', i18next.t('flash.statuses.create.success'));
           reply.redirect(app.reverse('statuses'));
@@ -52,7 +52,7 @@ export default (app) => {
             body: { data },
           } = req;
           const status = await app.objection.models.status.query().findById(req.params.id);
-          await status.$query().patch(data);
+          await status.$query().patch({ name: req.body.data.name.trim() });
           req.flash('success', i18next.t('flash.statuses.edit.success'));
           reply.redirect(app.reverse('statuses'));
           return reply;

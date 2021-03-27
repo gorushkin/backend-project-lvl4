@@ -49,8 +49,12 @@
       "executorId": 1
     },
     "existing": {
+      "id": 1,
       "name": "task1",
-      "creatorId": 4
+      "description": "task1_description",
+      "statusId": 2,
+      "creatorId": 4,
+      "executorId": 1
     },
     "fullyUpdated": {
       "name": "updated task1",

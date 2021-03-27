@@ -107,14 +107,12 @@ describe('test statuses CRUD', () => {
 
   describe('templates test', () => {
     test.each(
-      templatesTestsData.map(({
-        testName, testUrl, isAuthenticated, statusCode,
-      }) => [
+      templatesTestsData.map(({ testName, testUrl, isAuthenticated, statusCode }) => [
         testName,
         testUrl,
         isAuthenticated,
         statusCode,
-      ]),
+      ])
     )('%s,', async (_, testUrl, isAuthenticated, statusCode) => {
       const exsistingTaskData = testData.tasks.existing;
       const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
@@ -134,24 +132,22 @@ describe('test statuses CRUD', () => {
       testName: 'Update existing task with name only',
       testData: testData.tasks.existing,
       updatedTestData: testData.tasks.withNameOnlyUpdated,
-      payloadData: (data) => ({ name: data.name }),
+      payloadData: (data) => ({ ...testData.tasks.existing, name: data.name }),
       expectedData: testData.tasks.withNameOnlyUpdated,
     },
     {
       testName: 'Update existing task with executor only',
       testData: testData.tasks.existing,
       updatedTestData: testData.tasks.withExecutorOnlyUpdated,
-      payloadData: (data) => ({ executorId: data.executorId }),
+      payloadData: (data) => ({ ...testData.tasks.existing, executorId: data.executorId }),
       expectedData: testData.tasks.withExecutorOnlyUpdated,
-
     },
     {
       testName: 'Update existing task with status only',
       testData: testData.tasks.existing,
       updatedTestData: testData.tasks.withStatusOnlyUpdated,
-      payloadData: (data) => ({ statusId: data.statusId }),
+      payloadData: (data) => ({ ...testData.tasks.existing, statusId: data.statusId }),
       expectedData: testData.tasks.withStatusOnlyUpdated,
-
     },
     {
       testName: 'Update existing task with all fields',
@@ -159,31 +155,27 @@ describe('test statuses CRUD', () => {
       updatedTestData: testData.tasks.fullyUpdated,
       payloadData: (data) => data,
       expectedData: testData.tasks.fullyUpdated,
-
     },
     {
       testName: 'is not possible to update creatorId',
       testData: testData.tasks.existing,
       updatedTestData: testData.tasks.withCreatorOnlyUpdated,
-      payloadData: (data) => ({ creatorId: data.creatorId }),
+      payloadData: (data) => ({ ...testData.tasks.existing, creatorId: data.creatorId }),
       expectedData: testData.tasks.existing,
-
     },
   ];
 
   describe('patch tests', () => {
     test.each(
       patchTaskTestsData.map(
-        ({
-          testName, testData: initialData, updatedTestData, payloadData, expectedData,
-        }) => [
+        ({ testName, testData: initialData, updatedTestData, payloadData, expectedData }) => [
           testName,
           initialData,
           updatedTestData,
           payloadData,
           expectedData,
-        ],
-      ),
+        ]
+      )
     )('%s', async (_, initialData, updatedTestData, payloadData, expectedData) => {
       const { id } = await models.task.query().findOne({ name: initialData.name });
       const response = await app.inject({
