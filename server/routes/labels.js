@@ -62,9 +62,9 @@ export default (app) => {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
             reply.render('labels/edit', {
-                label: { ...req.body.data, id: `${req.params.id}` },
-                errors: error.data,
-              });
+              label: { ...req.body.data, id: req.params.id },
+              errors: error.data,
+            });
             return reply;
           }
           throw error;

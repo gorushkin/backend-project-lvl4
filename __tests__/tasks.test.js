@@ -107,12 +107,14 @@ describe('test statuses CRUD', () => {
 
   describe('templates test', () => {
     test.each(
-      templatesTestsData.map(({ testName, testUrl, isAuthenticated, statusCode }) => [
+      templatesTestsData.map(({
+        testName, testUrl, isAuthenticated, statusCode,
+      }) => [
         testName,
         testUrl,
         isAuthenticated,
         statusCode,
-      ])
+      ]),
     )('%s,', async (_, testUrl, isAuthenticated, statusCode) => {
       const exsistingTaskData = testData.tasks.existing;
       const { id } = await models.task.query().findOne({ name: exsistingTaskData.name });
@@ -168,14 +170,16 @@ describe('test statuses CRUD', () => {
   describe('patch tests', () => {
     test.each(
       patchTaskTestsData.map(
-        ({ testName, testData: initialData, updatedTestData, payloadData, expectedData }) => [
+        ({
+          testName, testData: initialData, updatedTestData, payloadData, expectedData,
+        }) => [
           testName,
           initialData,
           updatedTestData,
           payloadData,
           expectedData,
-        ]
-      )
+        ],
+      ),
     )('%s', async (_, initialData, updatedTestData, payloadData, expectedData) => {
       const { id } = await models.task.query().findOne({ name: initialData.name });
       const response = await app.inject({

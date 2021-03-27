@@ -19,6 +19,8 @@ overrides:
 
 rules:
   no-console: 0
+  no-restricted-syntax:
+    [0, "ForOfStatement"]
   import/extensions: 0
   new-cap:
     - error

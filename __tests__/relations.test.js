@@ -24,7 +24,6 @@ describe('test relations CRUD', () => {
 
   it('Create task with labelId should create only task-label relation', async () => {
     const taskData = testData.tasks.newTaskData;
-    const expectedRelatedLabel = testData.labels.relatedNew;
 
     const response = await app.inject({
       method: 'POST',
@@ -40,10 +39,14 @@ describe('test relations CRUD', () => {
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
 
-    const [label] = labels.flat();
+    const newTask = await models.task.query().findOne({ 'tasks.name': taskData.name });
+
+    for await (const label of labels) {
+      const [fromRelationsTask] = await label.$relatedQuery('tasks');
+      expect(newTask).toMatchObject(fromRelationsTask);
+    }
 
     expect(response.statusCode).toBe(302);
-    expect(label).toMatchObject(expectedRelatedLabel);
   });
 
   it('Update task with adding labelId relation should add one label relations', async () => {
@@ -67,8 +70,8 @@ describe('test relations CRUD', () => {
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
 
-    for await (let label of labels ) {
-      const [upatedTask] = await  label.$relatedQuery('tasks');
+    for await (const label of labels) {
+      const [upatedTask] = await label.$relatedQuery('tasks');
       expect(task).toMatchObject(upatedTask);
     }
 
@@ -96,10 +99,10 @@ describe('test relations CRUD', () => {
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
 
-      for await (let label of labels ) {
-        const [upatedTask] = await  label.$relatedQuery('tasks');
-        expect(task).toMatchObject(upatedTask);
-      }
+    for await (const label of labels) {
+      const [upatedTask] = await label.$relatedQuery('tasks');
+      expect(task).toMatchObject(upatedTask);
+    }
 
     expect(response.statusCode).toBe(302);
   });
