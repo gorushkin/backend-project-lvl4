@@ -29,7 +29,8 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.create.error'));
-            reply.render('/labels/new', { label: req.body.data, errors: error.data });
+            const label = (new app.objection.models.label()).$set(req.body.data);
+            reply.render('/labels/new', { label, errors: error.data });
             return reply;
           }
           throw error;
@@ -61,8 +62,9 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
+            const label = (new app.objection.models.label()).$set({ ...req.body.data, id: req.params.id });
             reply.render('labels/edit', {
-              label: { ...req.body.data, id: req.params.id },
+              label,
               errors: error.data,
             });
             return reply;

@@ -62,8 +62,9 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.users.edit.error'));
+            const user = (new app.objection.models.user()).$set({ ...req.body.data, id: req.params.id });
             reply.render('users/edit', {
-              user: { ...req.body.data, id: req.params.id },
+              user,
               errors: error.data,
             });
             return reply;
