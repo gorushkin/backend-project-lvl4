@@ -131,7 +131,7 @@ const registerPlugins = (app) => {
   });
 
   app.decorate('checkIfUserCanEditProfile', (request, reply, done) => {
-    if (request.user.id === parseInt(request.params.id, 10)) {
+    if (request.user?.id === parseInt(request.params.id, 10)) {
       return done();
     }
     request.flash('error', i18next.t('flash.users.authError'));
