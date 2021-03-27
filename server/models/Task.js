@@ -66,16 +66,16 @@ export default class Task extends Model {
   }
 
   static modifiers = {
-    filterCreator(query, creator) {
-      query.where('creator.id', creator);
+    filterCreator(query, id) {
+      query.where('creatorId', id);
     },
 
     filterExecutor(query, id) {
-      query.where('executor.id', id);
+      query.where('executorId', id);
     },
 
     filterStatus(query, id) {
-      query.where('status.id', id);
+      query.where('statusId', id);
     },
 
     filterLabel(query, id) {

@@ -29,7 +29,7 @@ export default (app) => {
       }
 
       if (query.isCreatorUser) {
-        tasksQuery.modify('filterCreator', { isCreatorUser: id });
+        tasksQuery.modify('filterCreator', id);
       }
 
       const [tasks, users, statuses, labels] = await Promise.all([
