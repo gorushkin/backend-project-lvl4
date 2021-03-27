@@ -38,7 +38,7 @@ describe('test relations CRUD', () => {
     const { labels } = await models.task
       .query()
       .findOne({ 'tasks.name': taskData.name })
-      .withGraphJoined('[creator, executor, status, labels]');
+      .withGraphJoined('labels');
 
     const [label] = labels.flat();
 
@@ -65,12 +65,12 @@ describe('test relations CRUD', () => {
     const { labels } = await models.task
       .query()
       .findOne({ 'tasks.name': taskData.name })
-      .withGraphJoined('[creator, executor, status, labels]');
+      .withGraphJoined('labels');
 
-    labels.forEach(async (label) => {
-      const [upatedTask] = await label.$relatedQuery('tasks');
+    for await (let label of labels ) {
+      const [upatedTask] = await  label.$relatedQuery('tasks');
       expect(task).toMatchObject(upatedTask);
-    });
+    }
 
     expect(response.statusCode).toBe(302);
   });
@@ -94,12 +94,12 @@ describe('test relations CRUD', () => {
     const { labels } = await models.task
       .query()
       .findOne({ 'tasks.name': taskData.name })
-      .withGraphJoined('[creator, executor, status, labels]');
+      .withGraphJoined('labels');
 
-    labels.forEach(async (label) => {
-      const [upatedTask] = await label.$relatedQuery('tasks');
-      expect(task).toMatchObject(upatedTask);
-    });
+      for await (let label of labels ) {
+        const [upatedTask] = await  label.$relatedQuery('tasks');
+        expect(task).toMatchObject(upatedTask);
+      }
 
     expect(response.statusCode).toBe(302);
   });
