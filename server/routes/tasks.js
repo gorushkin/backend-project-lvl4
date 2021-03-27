@@ -1,6 +1,7 @@
 // @ts-check
 
 import i18next from 'i18next';
+import _ from 'lodash';
 import { ValidationError } from 'objection';
 
 export default (app) => {
@@ -72,11 +73,11 @@ export default (app) => {
       const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
       const data = {
-        name: name.trim(),
-        description: description.trim(),
+        name: _.trim(name),
+        description: _.trim(description),
         creatorId: req.user.id,
-        statusId: statusId ? parseInt(statusId, 10) : null,
-        executorId: executorId ? parseInt(executorId, 10) : null,
+        ... (statusId && {statusId: parseInt(statusId, 10)}),
+        ... (executorId && {executorId: parseInt(statusId, 10)}),
       };
 
       try {
@@ -163,13 +164,13 @@ export default (app) => {
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
         const data = {
-          name: name.trim(),
-          description,
+          name: _.trim(name),
+          description: _.trim(description),
           labels: labelIds,
           id: parseInt(req.params.id, 10),
           creatorId: req.user.id,
-          statusId: statusId ? parseInt(statusId, 10) : null,
-          executorId: executorId ? parseInt(executorId, 10) : null,
+          ... (statusId && {statusId: parseInt(statusId, 10)}),
+          ... (executorId && {executorId: parseInt(executorId, 10)}),
         };
 
         try {
