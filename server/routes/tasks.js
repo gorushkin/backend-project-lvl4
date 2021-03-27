@@ -75,8 +75,8 @@ export default (app) => {
         name: name.trim(),
         description: description.trim(),
         creatorId: req.user.id,
-        statusId: statusId ? parseInt(statusId, 10) : undefined,
-        executorId: executorId ? parseInt(executorId, 10) : undefined,
+        statusId: statusId ? parseInt(statusId, 10) : null,
+        executorId: executorId ? parseInt(executorId, 10) : null,
       };
 
       try {
@@ -168,8 +168,8 @@ export default (app) => {
           labels: labelIds,
           id: parseInt(req.params.id, 10),
           creatorId: req.user.id,
-          statusId: statusId ? parseInt(statusId, 10) : undefined,
-          executorId: executorId ? parseInt(executorId, 10) : undefined,
+          statusId: statusId ? parseInt(statusId, 10) : null,
+          executorId: executorId ? parseInt(executorId, 10) : null,
         };
 
         try {
