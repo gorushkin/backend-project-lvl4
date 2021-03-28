@@ -71,7 +71,7 @@ export default (app) => {
 
       const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-      const payload = app.objection.models.task.getPayload({
+      const payload = app.objection.models.task.mapFormToModel({
         name,
         description,
         statusId,
@@ -160,7 +160,7 @@ export default (app) => {
           },
         } = req;
 
-        const payload = app.objection.models.task.getPayload({
+        const payload = app.objection.models.task.mapFormToModel({
           name,
           description,
           statusId,

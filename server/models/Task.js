@@ -84,7 +84,7 @@ export default class Task extends Model {
     },
   };
 
-  static getPayload({
+  static mapFormToModel({
     name, description, statusId, executorId, id, labels, creatorId,
   }) {
     const labelIds = [labels].flat().map((labelId) => ({ id: parseInt(labelId, 10) }));
