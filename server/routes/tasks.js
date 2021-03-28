@@ -1,7 +1,6 @@
 // @ts-check
 
 import i18next from 'i18next';
-import _ from 'lodash';
 import { ValidationError } from 'objection';
 
 export default (app) => {
@@ -72,16 +71,16 @@ export default (app) => {
 
       const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-      const data = {
-        name: _.trim(name),
-        description: _.trim(description),
+      const payload = app.objection.models.task.getPayload({
+        name,
+        description,
+        statusId,
+        executorId,
         creatorId: req.user.id,
-        ... (statusId && {statusId: parseInt(statusId, 10)}),
-        ... (executorId && {executorId: parseInt(statusId, 10)}),
-      };
+      });
 
       try {
-        const task = await app.objection.models.task.fromJson(data);
+        const task = await app.objection.models.task.fromJson(payload);
 
         await app.objection.models.task.transaction(async (trx) => {
           await app.objection.models.task.query(trx).insertGraph([{ ...task, labels: labelIds }], {
@@ -95,7 +94,7 @@ export default (app) => {
       } catch (error) {
         if (error instanceof ValidationError) {
           req.flash('error', i18next.t('flash.tasks.create.error'));
-          const task = (new app.objection.models.task()).$set(req.body.data);
+          const task = new app.objection.models.task().$set(req.body.data);
           const [users, statuses, labelList] = await Promise.all([
             app.objection.models.user.query(),
             app.objection.models.status.query(),
@@ -161,21 +160,19 @@ export default (app) => {
           },
         } = req;
 
-        const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
-
-        const data = {
-          name: _.trim(name),
-          description: _.trim(description),
-          labels: labelIds,
+        const payload = app.objection.models.task.getPayload({
+          name,
+          description,
+          statusId,
+          executorId,
+          labels,
           id: parseInt(req.params.id, 10),
           creatorId: req.user.id,
-          ... (statusId && {statusId: parseInt(statusId, 10)}),
-          ... (executorId && {executorId: parseInt(executorId, 10)}),
-        };
+        });
 
         try {
           await app.objection.models.task.transaction(async (trx) => {
-            await app.objection.models.task.query(trx).upsertGraph(data, {
+            await app.objection.models.task.query(trx).upsertGraph(payload, {
               relate: true,
               unrelate: true,
             });
@@ -215,9 +212,7 @@ export default (app) => {
       async (req, reply) => {
         const task = await app.objection.models.task.query().findById(req.params.id);
         await app.objection.models.task.transaction(async (trx) => {
-          await task
-            .$relatedQuery('labels', trx)
-            .unrelate();
+          await task.$relatedQuery('labels', trx).unrelate();
           await task.$query(trx).delete();
         });
         req.flash('info', i18next.t('flash.tasks.delete.success'));

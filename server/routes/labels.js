@@ -2,7 +2,7 @@
 
 import i18next from 'i18next';
 import { ValidationError } from 'objection';
-import _ from "lodash";
+import _ from 'lodash';
 
 export default (app) => {
   app
@@ -21,7 +21,7 @@ export default (app) => {
       async (req, reply) => {
         try {
           const label = await app.objection.models.label.fromJson({
-            name: _.trim(req.body.data.name)
+            name: _.trim(req.body.data.name),
           });
           await app.objection.models.label.query().insert(label);
           req.flash('info', i18next.t('flash.labels.create.success'));
@@ -63,7 +63,8 @@ export default (app) => {
         } catch (error) {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.labels.edit.error'));
-            const label = (new app.objection.models.label()).$set({ ...req.body.data, id: req.params.id });
+            const label = (new app.objection.models.label())
+              .$set({ ...req.body.data, id: req.params.id });
             reply.render('labels/edit', {
               label,
               errors: error.data,

@@ -2,6 +2,7 @@
 
 import path from 'path';
 import { Model } from 'objection';
+import _ from 'lodash';
 
 export default class Task extends Model {
   static get tableName() {
@@ -82,4 +83,19 @@ export default class Task extends Model {
       query.where('labels.id', id);
     },
   };
+
+  static getPayload({
+    name, description, statusId, executorId, id, labels, creatorId,
+  }) {
+    const labelIds = [labels].flat().map((labelId) => ({ id: parseInt(labelId, 10) }));
+    return {
+      name: _.trim(name),
+      description: _.trim(description),
+      creatorId,
+      ...(statusId && { statusId: parseInt(statusId, 10) }),
+      ...(id && { id: parseInt(id, 10) }),
+      ...(executorId && { executorId: parseInt(executorId, 10) }),
+      ...(labels && { labels: labelIds }),
+    };
+  }
 }
