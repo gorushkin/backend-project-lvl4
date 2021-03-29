@@ -71,16 +71,14 @@ export default (app) => {
 
       const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-      const payload = app.objection.models.task.mapFormToModel({
-        name,
-        description,
-        statusId,
-        executorId,
-        creatorId: req.user.id,
-      });
-
       try {
-        const task = await app.objection.models.task.fromJson(payload);
+        const task = await app.objection.models.task.fromJson({
+          name,
+          description,
+          statusId,
+          executorId,
+          creatorId: req.user.id,
+        });
 
         await app.objection.models.task.transaction(async (trx) => {
           await app.objection.models.task.query(trx).insertGraph([{ ...task, labels: labelIds }], {
@@ -152,30 +150,15 @@ export default (app) => {
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
-        const {
-          body: {
-            data: {
-              name, executorId, statusId, description, labels = [],
-            },
-          },
-        } = req;
-
-        const payload = app.objection.models.task.mapFormToModel({
-          name,
-          description,
-          statusId,
-          executorId,
-          labels,
-          id: parseInt(req.params.id, 10),
-          creatorId: req.user.id,
-        });
-
         try {
           await app.objection.models.task.transaction(async (trx) => {
-            await app.objection.models.task.query(trx).upsertGraph(payload, {
-              relate: true,
-              unrelate: true,
-            });
+            await app.objection.models.task.query(trx).upsertGraph(
+              { ...req.body.data, id: req.params.id, creatorId: req.user.id },
+              {
+                relate: true,
+                unrelate: true,
+              },
+            );
           });
           req.flash('success', i18next.t('flash.tasks.edit.success'));
           reply.redirect('/tasks');

@@ -5,6 +5,22 @@ import { Model } from 'objection';
 import _ from 'lodash';
 
 export default class Task extends Model {
+  $parseJson(json, options) {
+    const parsed = super.$parseJson(json, options);
+    return {
+      ...parsed,
+      ...(parsed.name && { name: _.trim(parsed.name) }),
+      ...(parsed.description && { description: _.trim(parsed.description) }),
+      ...(parsed.creatorId && { creatorId: parsed.creatorId }),
+      ...(parsed.statusId && { statusId: parseInt(parsed.statusId, 10) }),
+      ...(parsed.id && { id: parseInt(parsed.id, 10) }),
+      ...(parsed.executorId && { executorId: parseInt(parsed.executorId, 10) }),
+      ...(parsed.labels && {
+        labels: [parsed.labels].flatMap((labelId) => ({ id: parseInt(labelId, 10) })),
+      }),
+    };
+  }
+
   static get tableName() {
     return 'tasks';
   }
@@ -83,19 +99,4 @@ export default class Task extends Model {
       query.where('labels.id', id);
     },
   };
-
-  static mapFormToModel({
-    name, description, statusId, executorId, id, labels, creatorId,
-  }) {
-    const labelIds = [labels].flat().map((labelId) => ({ id: parseInt(labelId, 10) }));
-    return {
-      name: _.trim(name),
-      description: _.trim(description),
-      creatorId,
-      ...(statusId && { statusId: parseInt(statusId, 10) }),
-      ...(id && { id: parseInt(id, 10) }),
-      ...(executorId && { executorId: parseInt(executorId, 10) }),
-      ...(labels && { labels: labelIds }),
-    };
-  }
 }
