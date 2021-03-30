@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a.nav-link(href='/tasks/new')= t('views.tasks.create')
+  a.nav-link(href=route('taskNew'))= t('views.tasks.create')
   .jumbotron.p-2
     +formFor()(action=route('tasks') method='get' class="form-inline")
       +filterSelect('status', statuses)
@@ -24,7 +24,7 @@ block content
         tr
           td= task.id
           td
-            a(href=route('taskDetails', {id: task.id}))= task.name
+            a(href=route('taskShow', { id: task.id }))= task.name
           td= task.status.name
           td= `${task.creator.name}`
           if task.executor
@@ -33,5 +33,5 @@ block content
             td
           td= formatDate(task.createdAt)
           td
-            a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
-            +buttonTo(route('taskDelete', {id: task.id}), 'delete')(class="btn btn-link" value=t('views.tasks.delete'))
+            a(href=route('taskEdit', { id: task.id }))= t('views.tasks.edit')
+            +buttonTo(route('taskDelete', { id: task.id }), 'delete')(class="btn btn-link" value=t('views.tasks.delete'))

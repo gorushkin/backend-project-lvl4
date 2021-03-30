@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a.nav-link(href='/labels/new')= t('views.labels.create')
+  a.nav-link(href=route('labelNew'))= t('views.labels.create')
   table.table.table-striped
     thead
       tr
@@ -16,5 +16,5 @@ block content
           td= label.name
           td= formatDate(label.createdAt)
           td
-            a(href=route('labelEdit', {id: label.id}))= t('views.labels.edit')
-            +buttonTo(route('labelsDelete', {id: label.id}) , 'delete')(class="btn btn-link" value=t('views.labels.delete'))
+            a(href=route('labelEdit', { id: label.id }))= t('views.labels.edit')
+            +buttonTo(route('labelsDelete', { id: label.id }) , 'delete')(class="btn btn-link" value=t('views.labels.delete'))

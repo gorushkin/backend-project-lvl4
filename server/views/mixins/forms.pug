@@ -10,13 +10,14 @@ mixin input(entity, propertyName, errors = {})
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (!propertyErrors ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
+  - name = getInputName(propertyName)
   .form-group(class=(errors[propertyName] && 'has-danger'))
     label(
       for= inputId
     )= t(`form.${propertyName}`)
     input(
       id= inputId
-      name=getInputName(propertyName)
+      name= name
       class=classLine
       value=_.get(entity, propertyName, '')
     )&attributes(attributes)

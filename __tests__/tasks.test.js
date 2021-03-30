@@ -93,7 +93,7 @@ describe('test statuses CRUD', () => {
     },
     {
       testName: 'Get status code 200 on /tasks/:id',
-      testUrl: (server, id) => server.reverse('taskDetails', { id }),
+      testUrl: (server, id) => server.reverse('taskShow', { id }),
       isAuthenticated: true,
       statusCode: 200,
     },

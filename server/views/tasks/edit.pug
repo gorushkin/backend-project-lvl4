@@ -4,7 +4,7 @@ block header
   = t('views.tasks.editTitle')
 
 block content
-  +formFor()(action=route('taskUpdate', {id: task.id}) method='post')
+  +formFor()(action=route('taskUpdate', { id: task.id }) method='post')
     +input(task, 'name', errors)(type="text")
     +input(task, 'description', errors)(type="text")
     +select(task, 'statusId', errors, statuses)

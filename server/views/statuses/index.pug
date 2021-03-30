@@ -1,7 +1,7 @@
 extends ../layouts/application.pug
 
 block content
-  a.nav-link(href='/statuses/new')= t('views.statuses.create')
+  a.nav-link(href=route('newStatus'))= t('views.statuses.create')
   table.table.table-striped
     thead
       tr
@@ -16,5 +16,5 @@ block content
           td= status.name
           td= formatDate(status.createdAt)
           td
-            a(href=route('statusEdit', {id: status.id}))= t('views.statuses.edit')
-            +buttonTo(route('statusDelete', {id: status.id}), 'delete')(class="btn btn-link" value=t('views.statuses.delete'))
+            a(href=route('statusEdit', { id: status.id }))= t('views.statuses.edit')
+            +buttonTo(route('statusDelete', { id: status.id }), 'delete')(class="btn btn-link" value=t('views.statuses.delete'))

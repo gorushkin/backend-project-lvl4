@@ -34,6 +34,6 @@ block content
               li= label.name
       .row.p-1
         .col
-          a(href=route('taskEdit', {id: task.id}))= t('views.tasks.edit')
-          +buttonTo(route('taskDelete', {id: task.id}), 'delete')(class="btn btn-link" value=t('views.tasks.delete'))
+          a(href=route('taskEdit', { id: task.id }))= t('views.tasks.edit')
+          +buttonTo(route('taskDelete', { id: task.id }), 'delete')(class="btn btn-link" value=t('views.tasks.delete'))
 

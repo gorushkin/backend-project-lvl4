@@ -112,7 +112,7 @@ export default (app) => {
     })
     .get(
       '/tasks/:id',
-      { name: 'taskDetails', preValidation: app.authenticate },
+      { name: 'taskShow', preValidation: app.authenticate },
       async (req, reply) => {
         const task = await app.objection.models.task
           .query()

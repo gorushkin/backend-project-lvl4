@@ -5,7 +5,7 @@ block header
 
 
 block content
-  +formFor()(action=`/users/${user.id}` method='post')
+  +formFor()(action=route('userUpdate', { id: user.id }) method='post')
     +input(user, 'firstname', errors)(type="text")
     +input(user, 'lastname', errors)(type="text")
     +input(user, 'email', errors)(type="text")
