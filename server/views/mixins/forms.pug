@@ -51,7 +51,7 @@ mixin select(entity, propertyName, errors = {}, items, multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= isItemSelected(item.id, entityName[propertyName]))= item.name
+        option(value=item.id, selected= isItemSelected(item.id, entity[propertyName]))= item.name
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 

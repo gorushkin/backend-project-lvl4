@@ -180,8 +180,8 @@ module.exports = {
         status: 'Статус',
         executor: 'Исполнитель',
         label: 'Метка',
-        isCreatorUser: "Только мои задачи"
-      }
+        isCreatorUser: 'Только мои задачи',
+      },
     },
   },
 };
