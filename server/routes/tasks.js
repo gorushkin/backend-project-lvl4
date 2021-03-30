@@ -122,7 +122,7 @@ export default (app) => {
           req.flash('error', i18next.t('flash.tasks.detailsError'));
           reply.redirect(app.reverse('tasks'));
         } else {
-          reply.render('tasks/details', { task });
+          reply.render('tasks/show', { task });
         }
         return reply;
       },
