@@ -1,10 +1,19 @@
 // @ts-check
 
 import { Model } from 'objection';
+import _ from 'lodash';
 
 import path from 'path';
 
 export default class Label extends Model {
+  $parseJson(json, options) {
+    const parsed = super.$parseJson(json, options);
+    return {
+      ...parsed,
+      ...(parsed.name && { name: _.trim(parsed.name) }),
+    };
+  }
+
   static get tableName() {
     return 'labels';
   }

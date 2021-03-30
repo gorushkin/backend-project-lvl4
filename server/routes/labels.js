@@ -20,9 +20,7 @@ export default (app) => {
       { name: 'labelCreate', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const label = await app.objection.models.label.fromJson({
-            name: _.trim(req.body.data.name),
-          });
+          const label = await app.objection.models.label.fromJson(req.body.data);
           await app.objection.models.label.query().insert(label);
           req.flash('info', i18next.t('flash.labels.create.success'));
           reply.redirect(app.reverse('labels'));
@@ -52,11 +50,8 @@ export default (app) => {
       { name: 'labelUpdate', preValidation: app.authenticate },
       async (req, reply) => {
         try {
-          const {
-            body: { data },
-          } = req;
           const label = await app.objection.models.label.query().findById(req.params.id);
-          await label.$query().patch({ name: _.trim(data.name) });
+          await label.$query().patch(req.body.data);
           req.flash('success', i18next.t('flash.labels.edit.success'));
           reply.redirect('/labels');
           return reply;
