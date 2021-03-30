@@ -176,6 +176,12 @@ module.exports = {
           more: 'Узнать Больше',
         },
       },
+      filterName: {
+        status: 'Статус',
+        executor: 'Исполнитель',
+        label: 'Метка',
+        isCreatorUser: "Только мои задачи"
+      }
     },
   },
 };

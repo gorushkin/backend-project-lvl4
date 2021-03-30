@@ -33,13 +33,14 @@ mixin buttonTo(action, method)
     input(name="_method" type="hidden" value=method)
     input(type='submit')&attributes(attributes)
 
-mixin select(task, propertyName, errors = {}, items, multiple = false)
+mixin select(entity, propertyName, errors = {}, items, multiple = false)
   - propertyErrors = _.get(errors, propertyName)
   - classLine = 'form-control' + (!propertyErrors ? '' : ' is-invalid')
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
+  - entityName = entity.constructor.name.toLowerCase()
   .form-group
-    label(for=inputId)= t(`views.tasks.${propertyName}`)
+    label(for=inputId)= t(`views.${entityName}s.${propertyName}`)
     select.form-control(
         id= inputId,
         name=name,
@@ -49,17 +50,17 @@ mixin select(task, propertyName, errors = {}, items, multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= isItemSelected(item.id, task[propertyName]))= item.name
+        option(value=item.id, selected= isItemSelected(item.id, entity[propertyName]))= item.name
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
-mixin selectMultiple(task, propertyName, errors = {}, items)
-  +select(task, propertyName, errors, items, true)
+mixin selectMultiple(entity, propertyName, errors = {}, items)
+  +select(entity, propertyName, errors, items, true)
 
 mixin filterSelect(propertyName, items)
   - inputId = getInputId(propertyName)
   .form-group
-    label(for=inputId)= t(`views.tasks.${propertyName}`)
+    label(for=inputId)= t(`views.filterName.${propertyName}`)
     select.form-control.ml-2.mr-3(id= inputId, name=propertyName)
       option
       each item in items
@@ -71,4 +72,4 @@ mixin checkbox(propertyName)
   - name = getInputName(propertyName)
   .form-group.form-check
     input.form-check-input(id= inputId type='checkbox', name=propertyName, checked=(!!query[propertyName]))
-    label.form-check-label(for=inputId)= t(`views.tasks.${propertyName}`)
+    label.form-check-label(for=inputId)= t(`views.filterName.${propertyName}`)
