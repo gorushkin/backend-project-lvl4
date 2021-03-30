@@ -176,7 +176,7 @@ module.exports = {
           more: 'Узнать Больше',
         },
       },
-      filterName: {
+      formLabels: {
         status: 'Статус',
         executor: 'Исполнитель',
         label: 'Метка',

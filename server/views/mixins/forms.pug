@@ -61,7 +61,7 @@ mixin selectMultiple(entity, propertyName, errors = {}, items)
 mixin filterSelect(propertyName, items)
   - inputId = getInputId(propertyName)
   .form-group
-    label(for=inputId)= t(`views.filterName.${propertyName}`)
+    label(for=inputId)= t(`views.formLabels.${propertyName}`)
     select.form-control.ml-2.mr-3(id= inputId, name=propertyName)
       option
       each item in items
@@ -73,4 +73,4 @@ mixin checkbox(propertyName)
   - name = getInputName(propertyName)
   .form-group.form-check
     input.form-check-input(id= inputId type='checkbox', name=propertyName, checked=(!!query[propertyName]))
-    label.form-check-label(for=inputId)= t(`views.filterName.${propertyName}`)
+    label.form-check-label(for=inputId)= t(`views.formLabels.${propertyName}`)
