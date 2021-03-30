@@ -2,7 +2,6 @@
 
 import i18next from 'i18next';
 import { ValidationError } from 'objection';
-import _ from 'lodash';
 
 export default (app) => {
   app
@@ -21,7 +20,7 @@ export default (app) => {
       async (req, reply) => {
         try {
           const status = await app.objection.models.status
-            .fromJson({ name: _.trim(req.body.data.name) });
+            .fromJson(req.body.data);
           await app.objection.models.status.query().insert(status);
           req.flash('info', i18next.t('flash.statuses.create.success'));
           reply.redirect(app.reverse('statuses'));
@@ -51,7 +50,7 @@ export default (app) => {
       async (req, reply) => {
         try {
           const status = await app.objection.models.status.query().findById(req.params.id);
-          await status.$query().patch({ name: _.trim(req.body.data.name) });
+          await status.$query().patch(req.body.data);
           req.flash('success', i18next.t('flash.statuses.edit.success'));
           reply.redirect(app.reverse('statuses'));
           return reply;

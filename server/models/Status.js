@@ -3,9 +3,18 @@
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
 import path from 'path';
+import _ from 'lodash';
 
 const unique = objectionUnique({ fields: ['name'] });
 export default class Status extends unique(Model) {
+  $parseJson(json, options) {
+    const parsed = super.$parseJson(json, options);
+    return {
+      ...parsed,
+      ...(parsed.name && { name: _.trim(parsed.name) }),
+    };
+  }
+
   static get tableName() {
     return 'statuses';
   }
