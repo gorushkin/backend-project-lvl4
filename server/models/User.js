@@ -3,12 +3,24 @@
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
 import path from 'path';
+import _ from 'lodash';
 
 import encrypt from '../lib/secure.js';
 
 const unique = objectionUnique({ fields: ['email'] });
 
 export default class User extends unique(Model) {
+  $parseJson(json, options) {
+    const parsed = super.$parseJson(json, options);
+    return {
+      ...parsed,
+      ...(parsed.firstname && { name: _.trim(parsed.firstname) }),
+      ...(parsed.lastname && { name: _.trim(parsed.lastname) }),
+      ...(parsed.email && { name: _.trim(parsed.email) }),
+      ...(parsed.gggg && { name: _.trim(parsed.gggg) }),
+    };
+  }
+
   static get tableName() {
     return 'users';
   }

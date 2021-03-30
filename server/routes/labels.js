@@ -2,7 +2,6 @@
 
 import i18next from 'i18next';
 import { ValidationError } from 'objection';
-import _ from 'lodash';
 
 export default (app) => {
   app
