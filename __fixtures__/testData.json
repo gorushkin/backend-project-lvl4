@@ -129,6 +129,9 @@
       "id": 13
     },
     "relatedAdd": [13, 14],
-    "relatedRemove": [14]
+    "relatedRemove": [14],
+    "relatedRemovedlabel": {
+      "id": 13
+    }
   }
 }

@@ -81,6 +81,7 @@ describe('test relations CRUD', () => {
   it('Update task with removing labelId relation should removing one label relations', async () => {
     const taskData = testData.tasks.existing;
     const expectedRelatedLabelId = testData.labels.relatedRemove;
+    const labelRemovedFromRelation = testData.labels.relatedRemovedlabel;
 
     const task = await models.task.query().findOne({ 'tasks.name': taskData.name });
     const { id } = task;
@@ -98,6 +99,13 @@ describe('test relations CRUD', () => {
       .query()
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
+
+    const labelWithRemovedTaskRealation = await models.label.query()
+      .findById(labelRemovedFromRelation.id);
+
+    const [taskFromRemovedRelation] = await labelWithRemovedTaskRealation.$relatedQuery('tasks');
+
+    expect(taskFromRemovedRelation).toBeUndefined();
 
     for await (const label of labels) {
       const [upatedTask] = await label.$relatedQuery('tasks');
