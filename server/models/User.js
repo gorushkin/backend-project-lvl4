@@ -17,7 +17,7 @@ export default class User extends unique(Model) {
       ...(parsed.firstname && { name: _.trim(parsed.firstname) }),
       ...(parsed.lastname && { name: _.trim(parsed.lastname) }),
       ...(parsed.email && { name: _.trim(parsed.email) }),
-      ...(parsed.gggg && { name: _.trim(parsed.gggg) }),
+      ...(parsed.password && { name: _.trim(parsed.password) }),
     };
   }
 

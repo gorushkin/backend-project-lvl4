@@ -7,6 +7,7 @@ import _ from 'lodash';
 export default class Task extends Model {
   $parseJson(json, options) {
     const parsed = super.$parseJson(json, options);
+    console.log('parsed: ', parsed);
     return {
       ...parsed,
       ...(parsed.name && { name: _.trim(parsed.name) }),
@@ -15,9 +16,6 @@ export default class Task extends Model {
       ...(parsed.statusId && { statusId: parseInt(parsed.statusId, 10) }),
       ...(parsed.id && { id: parseInt(parsed.id, 10) }),
       ...(parsed.executorId && { executorId: parseInt(parsed.executorId, 10) }),
-      ...(parsed.labels && {
-        labels: [parsed.labels].flatMap((labelId) => ({ id: parseInt(labelId, 10) })),
-      }),
     };
   }
 

@@ -150,10 +150,16 @@ export default (app) => {
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
+        const labelIds = req.body.data.labels
+          ? [req.body.data.labels].flat().map((id) => ({ id: parseInt(id, 10) }))
+          : [];
+
         try {
           await app.objection.models.task.transaction(async (trx) => {
             await app.objection.models.task.query(trx).upsertGraph(
-              { ...req.body.data, id: req.params.id, creatorId: req.user.id },
+              {
+                ...req.body.data, labels: labelIds, id: req.params.id, creatorId: req.user.id,
+              },
               {
                 relate: true,
                 unrelate: true,
