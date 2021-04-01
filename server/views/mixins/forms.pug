@@ -40,6 +40,7 @@ mixin select(entity, propertyName, errors = {}, items, multiple = false)
   - inputId = getInputId(propertyName)
   - name = getInputName(propertyName)
   - entityName = entity.constructor.name.toLowerCase()
+  - selectedOptions = entity[propertyName] ? [entity[propertyName]].flat().map((item) => item.id ? Number(item.id) : Number(item)) : []
   .form-group
     label(for=inputId)= t(`views.${entityName}s.${propertyName}`)
     select.form-control(
@@ -51,7 +52,8 @@ mixin select(entity, propertyName, errors = {}, items, multiple = false)
       if !multiple
         option
       each item in items
-        option(value=item.id, selected= isItemSelected(item.id, entity[propertyName]))= item.name
+       - isSelect = _.includes(selectedOptions, item.id)
+        option(value=item.id, selected= isSelect)= item.name
     if !_.isEmpty(propertyErrors)
       .invalid-feedback= propertyErrors.map(({ message }) => message).join('. ')
 
