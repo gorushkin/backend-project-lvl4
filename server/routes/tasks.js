@@ -161,7 +161,6 @@ export default (app) => {
 
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
 
-
         try {
           await app.objection.models.task.transaction(async (trx) => {
             await app.objection.models.task.query(trx).upsertGraph(
