@@ -75,9 +75,10 @@ export default (app) => {
         const task = await app.objection.models.task.fromJson({
           name,
           description,
-          statusId,
-          executorId,
+          executorId: parseInt(executorId, 10),
           creatorId: req.user.id,
+          ...(executorId && { executorId: parseInt(executorId, 10) }),
+          ...(statusId && { statusId: parseInt(statusId, 10) }),
         });
 
         await app.objection.models.task.transaction(async (trx) => {
@@ -150,10 +151,28 @@ export default (app) => {
       '/tasks/:id',
       { name: 'taskUpdate', preValidation: app.authenticate },
       async (req, reply) => {
+        const {
+          body: {
+            data: {
+              name, description, statusId, executorId, labels = [],
+            },
+          },
+        } = req;
+
+        const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
+
         try {
           await app.objection.models.task.transaction(async (trx) => {
             await app.objection.models.task.query(trx).upsertGraph(
-              { ...req.body.data, id: req.params.id, creatorId: req.user.id },
+              {
+                name,
+                description,
+                labels: labelIds,
+                id: parseInt(req.params.id, 10),
+                creatorId: req.user.id,
+                ...(executorId && { executorId: parseInt(executorId, 10) }),
+                ...(statusId && { statusId: parseInt(statusId, 10) }),
+              },
               {
                 relate: true,
                 unrelate: true,

@@ -11,13 +11,6 @@ export default class Task extends Model {
       ...parsed,
       ...(parsed.name && { name: _.trim(parsed.name) }),
       ...(parsed.description && { description: _.trim(parsed.description) }),
-      ...(parsed.creatorId && { creatorId: parsed.creatorId }),
-      ...(parsed.statusId && { statusId: parseInt(parsed.statusId, 10) }),
-      ...(parsed.id && { id: parseInt(parsed.id, 10) }),
-      ...(parsed.executorId && { executorId: parseInt(parsed.executorId, 10) }),
-      ...(parsed.labels && {
-        labels: [parsed.labels].flatMap((labelId) => ({ id: parseInt(labelId, 10) })),
-      }),
     };
   }
 
