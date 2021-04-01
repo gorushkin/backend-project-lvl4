@@ -154,6 +154,12 @@ module.exports = {
         filter: 'Показать',
         isCreatorUser: 'Только мои задачи',
         label: 'Метка',
+        filters: {
+          status: 'Статус',
+          executor: 'Исполнитель',
+          label: 'Метка',
+          isCreatorUser: 'Только мои задачи',
+        },
       },
       labels: {
         id: 'ID',
@@ -176,12 +182,7 @@ module.exports = {
           more: 'Узнать Больше',
         },
       },
-      formLabels: {
-        status: 'Статус',
-        executor: 'Исполнитель',
-        label: 'Метка',
-        isCreatorUser: 'Только мои задачи',
-      },
+
     },
   },
 };
