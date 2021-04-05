@@ -7,6 +7,7 @@ export default (app) => {
   app
     .get('/users', { name: 'users' }, async (req, reply) => {
       const users = await app.objection.models.user.query();
+      console.log('users: ', users);
       reply.render('users/index', { users });
       return reply;
     })
@@ -28,7 +29,6 @@ export default (app) => {
     )
     .post('/users', { name: 'userCreate' }, async (req, reply) => {
       try {
-        console.log(req.body.data);
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);
         req.flash('info', i18next.t('flash.users.create.success'));
