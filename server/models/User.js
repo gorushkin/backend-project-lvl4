@@ -14,8 +14,8 @@ export default class User extends unique(Model) {
     const parsed = super.$parseJson(json, options);
     return {
       ...parsed,
-      ...(parsed.firstname && { name: _.trim(parsed.firstname) }),
-      ...(parsed.lastname && { name: _.trim(parsed.lastname) }),
+      ...(parsed.firstName && { name: _.trim(parsed.firstName) }),
+      ...(parsed.lastName && { name: _.trim(parsed.lastName) }),
       ...(parsed.email && { name: _.trim(parsed.email) }),
       ...(parsed.password && { name: _.trim(parsed.password) }),
     };
@@ -33,8 +33,8 @@ export default class User extends unique(Model) {
         id: { type: 'integer' },
         email: { type: 'string', format: 'email' },
         password: { type: 'string', minLength: 3 },
-        firstname: { type: 'string', minLength: 1 },
-        lastname: { type: 'string', minLength: 1 },
+        firstName: { type: 'string', minLength: 1 },
+        lastName: { type: 'string', minLength: 1 },
       },
     };
   }
@@ -61,6 +61,6 @@ export default class User extends unique(Model) {
   }
 
   get name() {
-    return `${this.firstname} ${this.lastname}`;
+    return `${this.firstName} ${this.lastName}`;
   }
 }
