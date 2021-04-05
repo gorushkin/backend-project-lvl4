@@ -2,12 +2,12 @@
 
   exports.up = (knex) => (
     knex.schema.table('users', (table) => {
-      table.string('firstName');
-      table.string('lastName');
+      table.string('first_name');
+      table.string('last_name');
     })
   );
 
   exports.down = (knex) => knex.schema.table('users', (table) => {
-    table.dropColumn('firstName');
-    table.dropColumn('lastName');
+    table.dropColumn('first_name');
+    table.dropColumn('last_name');
   });

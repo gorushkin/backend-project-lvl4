@@ -90,8 +90,8 @@ module.exports = {
       name: 'Наименование',
       email: 'Email',
       description: 'Описание',
-      firstname: 'Имя',
-      lastname: 'Фамилия',
+      firstName: 'Имя',
+      lastName: 'Фамилия',
       password: 'Пароль',
     },
     views: {
@@ -103,8 +103,8 @@ module.exports = {
       },
       users: {
         id: 'ID',
-        firstname: 'Имя',
-        lastname: 'Фамилия',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
         email: 'Email',
         createdAt: 'Дата создания',
         actions: 'Действия',

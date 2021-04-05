@@ -28,6 +28,7 @@ export default (app) => {
     )
     .post('/users', { name: 'userCreate' }, async (req, reply) => {
       try {
+        console.log(req.body.data);
         const user = await app.objection.models.user.fromJson(req.body.data);
         await app.objection.models.user.query().insert(user);
         req.flash('info', i18next.t('flash.users.create.success'));
