@@ -62,7 +62,6 @@ mixin selectMultiple(entity, propertyName, errors = {}, items)
 
 mixin filterSelect(propertyName, items)
   - inputId = getInputId(propertyName)
-  - console.log(item);
   .form-group
     label(for=inputId)= t(`views.tasks.${propertyName}`)
     select.form-control.ml-2.mr-3(id= inputId, name=propertyName)
