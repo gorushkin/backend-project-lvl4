@@ -105,6 +105,7 @@ module.exports = {
         id: 'ID',
         firstName: 'Имя',
         lastName: 'Фамилия22',
+        fullName: 'Полное имя',
         email: 'Email',
         createdAt: 'Дата создания',
         actions: 'Действия',
