@@ -123,6 +123,7 @@ module.exports = {
         createdAt: 'Дата создания',
         actions: '',
         edit: 'Изменить',
+        createBtn: 'Создать',
         new: {
           submit: 'Создать',
           signUp: 'Регистрация',
