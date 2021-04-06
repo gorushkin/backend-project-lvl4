@@ -10,7 +10,6 @@ export default class Task extends Model {
     return {
       ...parsed,
       ...(parsed.name && { name: _.trim(parsed.name) }),
-      ...(parsed.description && { description: _.trim(parsed.description) }),
     };
   }
 
