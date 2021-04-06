@@ -160,7 +160,13 @@ export default (app) => {
         } = req;
 
         const labelIds = [labels].flat().map((id) => ({ id: parseInt(id, 10) }));
-
+        console.log('-------------------------------');
+        console.log('labels: ', labels);
+        console.log('executorId: ', executorId);
+        console.log('statusId: ', statusId);
+        console.log('description: ', description);
+        console.log('name: ', name);
+        console.log('-------------------------------');
         try {
           await app.objection.models.task.transaction(async (trx) => {
             await app.objection.models.task.query(trx).upsertGraph(
@@ -172,7 +178,6 @@ export default (app) => {
                 creatorId: req.user.id,
                 ...(executorId && { executorId: parseInt(executorId, 10) }),
                 ...(statusId && { statusId: parseInt(statusId, 10) }),
-
               },
               {
                 relate: true,
