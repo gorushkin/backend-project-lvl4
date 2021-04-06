@@ -41,6 +41,7 @@ describe('test relations CRUD', () => {
 
     const newTask = await models.task.query().findOne({ 'tasks.name': taskData.name });
 
+    // eslint-disable-next-line no-restricted-syntax
     for await (const label of labels) {
       const [fromRelationsTask] = await label.$relatedQuery('tasks');
       expect(newTask).toMatchObject(fromRelationsTask);
@@ -70,6 +71,7 @@ describe('test relations CRUD', () => {
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
 
+    // eslint-disable-next-line no-restricted-syntax
     for await (const label of labels) {
       const [upatedTask] = await label.$relatedQuery('tasks');
       expect(task).toMatchObject(upatedTask);
@@ -107,6 +109,7 @@ describe('test relations CRUD', () => {
 
     expect(taskFromRemovedRelation).toBeUndefined();
 
+    // eslint-disable-next-line no-restricted-syntax
     for await (const label of labels) {
       const [upatedTask] = await label.$relatedQuery('tasks');
       expect(task).toMatchObject(upatedTask);
