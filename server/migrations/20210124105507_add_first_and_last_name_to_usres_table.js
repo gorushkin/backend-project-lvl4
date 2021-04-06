@@ -1,4 +1,4 @@
-  // @ts-check
+// @ts-check
 
 exports.up = (knex) => (
   knex.schema.table('users', (table) => {

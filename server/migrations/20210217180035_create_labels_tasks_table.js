@@ -1,4 +1,4 @@
-  // @ts-check
+// @ts-check
 
 exports.up = async (knex) => {
   await knex.schema.createTable('tasks_labels', (table) => {
