@@ -30,8 +30,6 @@ const mode = process.env.NODE_ENV || 'development';
 const isProduction = mode === 'production';
 const isDevelopment = mode === 'development';
 
-console.log('knexConfig[mode],: ', knexConfig[mode]);
-
 const rollbar = new Rollbar({
   accessToken: process.env.POST_SERVER_ITEM_ACCESS_TOKEN,
   captureUncaught: true,
