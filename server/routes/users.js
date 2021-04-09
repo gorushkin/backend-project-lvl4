@@ -38,7 +38,7 @@ export default (app) => {
           req.flash('error', i18next.t('flash.users.create.error'));
           const user = (new app.objection.models.user()).$set(req.body.data);
           reply.render('users/new', { user, errors: error.data });
-          return reply;
+          return reply.code(400);
         }
         throw error;
       }
@@ -68,7 +68,7 @@ export default (app) => {
               user,
               errors: error.data,
             });
-            return reply;
+            return reply.code(400);
           }
           throw error;
         }

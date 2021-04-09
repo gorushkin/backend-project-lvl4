@@ -26,7 +26,7 @@ export default class Task extends Model {
       properties: {
         id: { type: 'integer' },
         name: { type: 'string', minLength: 1 },
-        description: { type: 'text' },
+        description: { type: 'string' },
         creatorId: { type: 'integer' },
         statusId: { type: 'integer' },
         executorId: { type: 'integer' },

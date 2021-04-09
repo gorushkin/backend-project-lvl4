@@ -29,7 +29,7 @@ export default (app) => {
             req.flash('error', i18next.t('flash.labels.create.error'));
             const label = (new app.objection.models.label()).$set(req.body.data);
             reply.render('/labels/new', { label, errors: error.data });
-            return reply;
+            return reply.code(400);
           }
           throw error;
         }
@@ -63,7 +63,7 @@ export default (app) => {
               label,
               errors: error.data,
             });
-            return reply;
+            return reply.code(400);
           }
           throw error;
         }

@@ -106,7 +106,7 @@ export default (app) => {
             labels: labelList,
             errors: error.data,
           });
-          return reply;
+          return reply.code(400);
         }
         throw error;
       }
@@ -120,7 +120,7 @@ export default (app) => {
           .findById(req.params.id)
           .withGraphJoined('[creator, executor, status, labels]');
         if (!task) {
-          req.flash('error', i18next.t('flash.tasks.detailsError'));
+          req.flash('error', i18next.t('flash.tasks.showError'));
           reply.redirect(app.reverse('tasks'));
         } else {
           reply.render('tasks/show', { task });
@@ -197,8 +197,7 @@ export default (app) => {
               labels: taskLabels,
               errors: error.data,
             });
-
-            return reply;
+            return reply.code(400);
           }
           throw error;
         }

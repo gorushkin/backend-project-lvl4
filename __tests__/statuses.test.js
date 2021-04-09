@@ -96,7 +96,7 @@ describe('test statuses CRUD', () => {
       },
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(400);
 
     const updatedStatuses = await models.status.query();
     expect(updatedStatuses).toMatchObject(expectedStatuses);
