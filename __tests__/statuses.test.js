@@ -32,7 +32,7 @@ describe('test statuses CRUD', () => {
     expect(response.statusCode).toBe(200);
   });
 
-  it('Can not get statuse page work with unauthorized guest', async () => {
+  it('Can not get status page work with unauthorized guest', async () => {
     const response = await app.inject({
       method: 'GET',
       url: app.reverse('newStatus'),
@@ -52,8 +52,8 @@ describe('test statuses CRUD', () => {
   });
 
   it('Get statuses edit status code is 200', async () => {
-    const exsistingStatusData = testData.statuses.existing;
-    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+    const existingStatusData = testData.statuses.existing;
+    const { id } = await models.status.query().findOne({ name: existingStatusData.name });
 
     const response = await app.inject({
       method: 'GET',
@@ -83,7 +83,7 @@ describe('test statuses CRUD', () => {
   });
 
   it('Use can not create status with existing name', async () => {
-    const exsistingStatusData = testData.statuses.existing;
+    const existingStatusData = testData.statuses.existing;
 
     const expectedStatuses = await models.status.query();
 
@@ -92,7 +92,7 @@ describe('test statuses CRUD', () => {
       url: app.reverse('statusCreate'),
       cookies: cookie,
       payload: {
-        data: exsistingStatusData,
+        data: existingStatusData,
       },
     });
 
@@ -103,10 +103,10 @@ describe('test statuses CRUD', () => {
   });
 
   it('User can edit existing status', async () => {
-    const exsistingStatusData = testData.statuses.existing;
+    const existingStatusData = testData.statuses.existing;
     const updatedStatusData = testData.statuses.updated;
 
-    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+    const { id } = await models.status.query().findOne({ name: existingStatusData.name });
 
     const response = await app.inject({
       method: 'PATCH',
@@ -124,9 +124,9 @@ describe('test statuses CRUD', () => {
   });
 
   it('User can delete existing status', async () => {
-    const exsistingStatusData = testData.statuses.existing;
+    const existingStatusData = testData.statuses.existing;
 
-    const { id } = await models.status.query().findOne({ name: exsistingStatusData.name });
+    const { id } = await models.status.query().findOne({ name: existingStatusData.name });
 
     const response = await app.inject({
       method: 'DELETE',

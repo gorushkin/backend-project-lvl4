@@ -41,8 +41,10 @@ describe('test relations CRUD', () => {
 
     const newTask = await models.task.query().findOne({ 'tasks.name': taskData.name });
 
+    // Добавил исключение для правил чтобы jest правильно поймал ошибку внутри цикла
     // eslint-disable-next-line no-restricted-syntax
-    for await (const label of labels) {
+    for (const label of labels) {
+      // eslint-disable-next-line no-await-in-loop
       const [fromRelationsTask] = await label.$relatedQuery('tasks');
       expect(newTask).toMatchObject(fromRelationsTask);
     }
@@ -71,10 +73,12 @@ describe('test relations CRUD', () => {
       .findOne({ 'tasks.name': taskData.name })
       .withGraphJoined('labels');
 
+    // Добавил исключение для правил чтобы jest правильно поймал ошибку внутри цикла
     // eslint-disable-next-line no-restricted-syntax
-    for await (const label of labels) {
-      const [upatedTask] = await label.$relatedQuery('tasks');
-      expect(task).toMatchObject(upatedTask);
+    for (const label of labels) {
+      // eslint-disable-next-line no-await-in-loop
+      const [updatedTask] = await label.$relatedQuery('tasks');
+      expect(task).toMatchObject(updatedTask);
     }
 
     expect(response.statusCode).toBe(302);
@@ -109,10 +113,12 @@ describe('test relations CRUD', () => {
 
     expect(taskFromRemovedRelation).toBeUndefined();
 
+    // Добавил исключение для правил чтобы jest правильно поймал ошибку внутри цикла
     // eslint-disable-next-line no-restricted-syntax
-    for await (const label of labels) {
-      const [upatedTask] = await label.$relatedQuery('tasks');
-      expect(task).toMatchObject(upatedTask);
+    for (const label of labels) {
+      // eslint-disable-next-line no-await-in-loop
+      const [updatedTask] = await label.$relatedQuery('tasks');
+      expect(task).toMatchObject(updatedTask);
     }
 
     expect(response.statusCode).toBe(302);

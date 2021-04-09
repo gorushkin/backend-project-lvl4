@@ -43,8 +43,8 @@ describe('labels statuses CRUD', () => {
   });
 
   it('Labels edit page  status code is 200', async () => {
-    const exsistingLabelData = testData.labels.existing;
-    const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
+    const existingLabelData = testData.labels.existing;
+    const { id } = await models.label.query().findOne({ name: existingLabelData.name });
 
     const response = await app.inject({
       method: 'GET',
@@ -73,11 +73,11 @@ describe('labels statuses CRUD', () => {
     expect(label).toMatchObject(expected);
   });
 
-  it('Usewr can edit existing label', async () => {
-    const exsistingLabelData = testData.labels.existing;
+  it('User can edit existing label', async () => {
+    const existingLabelData = testData.labels.existing;
     const dataForLabelUpdating = testData.labels.updated;
 
-    const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
+    const { id } = await models.label.query().findOne({ name: existingLabelData.name });
 
     const response = await app.inject({
       method: 'PATCH',
@@ -95,9 +95,9 @@ describe('labels statuses CRUD', () => {
   });
 
   it('User can delete existing label', async () => {
-    const exsistingLabelData = testData.labels.existing;
+    const existingLabelData = testData.labels.existing;
 
-    const { id } = await models.label.query().findOne({ name: exsistingLabelData.name });
+    const { id } = await models.label.query().findOne({ name: existingLabelData.name });
 
     const response = await app.inject({
       method: 'DELETE',
