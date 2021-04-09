@@ -6,45 +6,49 @@ import { ValidationError } from 'objection';
 export default (app) => {
   app
     .get('/tasks', { name: 'tasks', preValidation: app.authenticate }, async (req, reply) => {
-      const {
-        query,
-        user: { id },
-      } = req;
+      try {
+        const {
+          query,
+          user: { id },
+        } = req;
 
-      const tasksQuery = app.objection.models.task
-        .query()
-        .withGraphJoined('[creator, executor, status, labels]');
+        const tasksQuery = app.objection.models.task
+          .query()
+          .withGraphJoined('[creator, executor, status, labels]');
 
-      if (query.executor) {
-        tasksQuery.modify('filterExecutor', query.executor);
+        if (query.executor) {
+          tasksQuery.modify('filterExecutor', query.executor);
+        }
+
+        if (query.status) {
+          tasksQuery.modify('filterStatus', query.status);
+        }
+
+        if (query.label) {
+          tasksQuery.modify('filterLabel', query.label);
+        }
+
+        if (query.isCreatorUser) {
+          tasksQuery.modify('filterCreator', id);
+        }
+
+        const [tasks, users, statuses, labels] = await Promise.all([
+          tasksQuery,
+          app.objection.models.user.query(),
+          app.objection.models.status.query(),
+          app.objection.models.label.query(),
+        ]);
+        reply.render('tasks/index', {
+          tasks,
+          users,
+          statuses,
+          labels,
+          query,
+        });
+        return reply;
+      } catch (error) {
+        console.log(error);
       }
-
-      if (query.status) {
-        tasksQuery.modify('filterStatus', query.status);
-      }
-
-      if (query.label) {
-        tasksQuery.modify('filterLabel', query.label);
-      }
-
-      if (query.isCreatorUser) {
-        tasksQuery.modify('filterCreator', id);
-      }
-
-      const [tasks, users, statuses, labels] = await Promise.all([
-        tasksQuery,
-        app.objection.models.user.query(),
-        app.objection.models.status.query(),
-        app.objection.models.label.query(),
-      ]);
-      reply.render('tasks/index', {
-        tasks,
-        users,
-        statuses,
-        labels,
-        query,
-      });
-      return reply;
     })
     .get('/tasks/new', { name: 'taskNew', preValidation: app.authenticate }, async (req, reply) => {
       const task = new app.objection.models.task();
