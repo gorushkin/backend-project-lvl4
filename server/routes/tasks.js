@@ -37,7 +37,11 @@ export default (app) => {
         app.objection.models.status.query(),
         app.objection.models.label.query(),
       ]);
+
+      const task = new app.objection.models.task();
+
       reply.render('tasks/index', {
+        task,
         tasks,
         users,
         statuses,
