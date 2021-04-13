@@ -29,7 +29,7 @@ export default (app) => {
           if (error instanceof ValidationError) {
             req.flash('error', i18next.t('flash.statuses.create.error'));
             reply.render('statuses/new', { status: req.body.data, errors: error.data });
-            return reply.code(400);
+            return reply.code(422);
           }
           throw error;
         }
@@ -61,7 +61,7 @@ export default (app) => {
               status: { ...req.body.data, id: req.params.id },
               errors: error.data,
             });
-            return reply.code(400);
+            return reply.code(422);
           }
           throw error;
         }

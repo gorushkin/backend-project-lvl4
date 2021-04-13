@@ -106,7 +106,7 @@ export default (app) => {
             labels: labelList,
             errors: error.data,
           });
-          return reply.code(400);
+          return reply.code(422);
         }
         throw error;
       }
@@ -197,7 +197,7 @@ export default (app) => {
               labels: taskLabels,
               errors: error.data,
             });
-            return reply.code(400);
+            return reply.code(422);
           }
           throw error;
         }
