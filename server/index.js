@@ -90,7 +90,7 @@ const addHooks = (app) => {
 const addErrorHadlers = (app) => {
   app.setErrorHandler((error, request, reply) => {
     const isUnhandledInternalError = reply.raw.statusCode === 500
-      && error.explicitInternalServerError !== true;
+    && error.explicitInternalServerError !== true;
     const errorMessage = isUnhandledInternalError ? 'Something went wrong!!!' : error.message;
     request.log.error(error);
     if (isProduction) rollbar.log(error);
@@ -130,23 +130,19 @@ const registerPlugins = (app) => {
     models,
   });
 
-  app.decorate('checkIfUserCanEditProfile', (request, reply, done) => {
-    if (request.user?.id === parseInt(request.params.id, 10)) {
-      return done();
+  app.decorate('checkIfUserCanEditProfile', async (request, reply) => {
+    if (request.user?.id !== parseInt(request.params.id, 10)) {
+      request.flash('error', i18next.t('flash.users.authError'));
+      reply.redirect('/users');
     }
-    request.flash('error', i18next.t('flash.users.authError'));
-    reply.redirect('/users');
-    return reply;
   });
 
-  app.decorate('checkIfUserCreatedTask', async (request, reply, done) => {
+  app.decorate('checkIfUserCreatedTask', async (request, reply) => {
     const { creatorId } = await app.objection.models.task.query().findById(request.params.id);
-    if (request.user.id === creatorId) {
-      return done();
+    if (request.user.id !== creatorId) {
+      request.flash('error', i18next.t('flash.tasks.authError'));
+      reply.redirect('/tasks');
     }
-    request.flash('error', i18next.t('flash.tasks.authError'));
-    reply.redirect('/tasks');
-    return reply;
   });
 };
 
