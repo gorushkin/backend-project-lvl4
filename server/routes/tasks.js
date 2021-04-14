@@ -172,7 +172,6 @@ export default (app) => {
                 description,
                 labels: labelIds,
                 id: parseInt(req.params.id, 10),
-                creatorId: req.user.id,
                 ...(executorId && { executorId: parseInt(executorId, 10) }),
                 ...(statusId && { statusId: parseInt(statusId, 10) }),
               },
